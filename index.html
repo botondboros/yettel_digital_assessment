@@ -1,0 +1,1214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Handset + Plan Checkout Friction Radar — Hungary</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{--ink:#1a1a1a;--ink-2:#4f4f4f;--ink-3:#7a7a7a;--paper:#f5f5f5;--panel:#ffffff;--line:#e4e4e4;
+    --digital:#1a1a1a;--digital-soft:#ccff00;--offline:#e0541f;--offline-soft:#fbe7dd;--grid:#efefef;
+    --meas:#00a15f;--meas-soft:#e6f5ef;}
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{background:var(--paper);color:var(--ink);font-family:'Inter',system-ui,sans-serif;line-height:1.5;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:1080px;margin:0 auto;padding:0 24px}
+  header{border-bottom:1px solid var(--line);padding:30px 0 0}
+  .eyebrow{font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--digital);font-weight:500;margin-bottom:14px}
+  h1{font-family:'Space Grotesk',sans-serif;font-weight:700;letter-spacing:-.02em;font-size:clamp(28px,4.4vw,44px);line-height:1.05;max-width:22ch}
+  .sub{margin-top:16px;max-width:70ch;color:var(--ink-2);font-size:16px}
+  .tabbar{display:flex;flex-wrap:wrap;gap:2px;margin-top:6px}
+  .tabbtn{font:inherit;font-family:'IBM Plex Mono',monospace;font-size:13px;letter-spacing:.04em;
+    background:none;border:none;border-bottom:2px solid transparent;color:var(--ink-3);
+    padding:12px 18px;cursor:pointer;font-weight:500}
+  .tabbtn.active{color:var(--ink);border-bottom-color:var(--digital)}
+  .tabbtn.key{color:var(--digital);background:var(--digital-soft);border-radius:5px 5px 0 0;font-weight:600}
+  .tabbtn.key:hover{color:var(--digital)}
+  .tabbtn.key.active{color:var(--digital);border-bottom-color:var(--digital)}
+  .tabbtn:hover{color:var(--ink)}
+  .tabpane{display:none} .tabpane.on{display:block}
+  section{padding:42px 0}
+  .slabel{font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-3);margin-bottom:18px;font-weight:500}
+  h2.mh{font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:22px;letter-spacing:-.01em;margin:38px 0 6px}
+  h2.mh:first-of-type{margin-top:8px}
+  .mlead{color:var(--ink-2);font-size:14.5px;max-width:74ch;margin-bottom:16px}
+  .chart-card{background:var(--panel);border:1px solid var(--line);border-radius:4px;padding:26px 22px 18px}
+  .chart-title{font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:19px;letter-spacing:-.01em}
+  .chart-note{color:var(--ink-2);font-size:14px;margin:6px 0 18px;max-width:78ch}
+  svg{width:100%;height:auto;display:block;overflow:visible}
+  .legend{display:flex;flex-wrap:wrap;gap:16px;margin-top:14px;font-size:13px}
+  .legend span{display:inline-flex;align-items:center;gap:7px;color:var(--ink-2)}
+  .legend i{width:22px;height:3px;border-radius:2px;display:inline-block}
+
+  /* ---- always-on comparison matrix ---- */
+  .mxwrap{background:var(--panel);border:1px solid var(--line);border-radius:4px;overflow:hidden}
+  .matrix{width:100%;border-collapse:collapse;table-layout:fixed}
+  .matrix th,.matrix td{border-bottom:1px solid var(--grid);border-right:1px solid var(--grid);vertical-align:top}
+  .matrix th:last-child,.matrix td:last-child{border-right:none}
+  .matrix tr:last-child td{border-bottom:none}
+  .mx-stage{width:23%;padding:13px 16px;background:var(--paper)}
+  td.mx-stage{font-size:13px;color:var(--ink)}
+  .mx-num{font-family:'IBM Plex Mono',monospace;color:var(--ink-3);font-size:11px;margin-right:8px}
+  th.mx-stage{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);font-weight:500}
+  .tcol-head{width:100%;display:flex;flex-direction:column;gap:3px;align-items:flex-start;text-align:left;
+    background:none;border:none;border-top:3px solid var(--c);padding:13px 16px 14px;cursor:pointer;font:inherit;color:inherit;transition:background .15s}
+  .tcol-head:hover{background:var(--digital-soft)}
+  .tcol-name{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:17px;color:var(--c)}
+  .tcol-score{font-family:'IBM Plex Mono',monospace;font-weight:600;font-size:24px;letter-spacing:-.02em;line-height:1}
+  .tcol-score small{font-size:12px;color:var(--ink-3);font-weight:500}
+  .tcol-tag{font-size:11.5px;color:var(--ink-2);line-height:1.35}
+  .tcol-hint{font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.04em;color:var(--digital);margin-top:3px}
+  .mx-cell{padding:11px 15px}
+  .mx-d{font-family:'IBM Plex Mono',monospace;font-weight:600;font-size:12px;padding:1px 6px;border-radius:3px;float:right;margin-left:8px}
+  .mx-d.neg{background:var(--offline-soft);color:var(--offline)}
+  .mx-d.pos{background:var(--meas-soft);color:var(--meas)}
+  .mx-d.zero{background:var(--grid);color:var(--ink-3)}
+  .mx-note{font-size:12.5px;color:var(--ink-2);line-height:1.4}
+  .mx-hint{font-size:12px;color:var(--ink-3);margin-top:12px;font-family:'IBM Plex Mono',monospace;letter-spacing:.02em}
+  .gb{display:inline-block;font-family:'IBM Plex Mono',monospace;font-weight:600;font-size:12px;padding:1px 7px;border-radius:3px}
+  .gb.pos{background:var(--meas-soft);color:var(--meas)}
+  .gb.zero{background:var(--grid);color:var(--ink-2)}
+  .gb.weak{background:var(--offline-soft);color:var(--offline)}
+  .psi-btn{display:inline-flex;align-items:center;font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--digital);text-decoration:none;border:1px solid var(--line);border-radius:4px;padding:7px 12px}
+  .psi-btn:hover{border-color:var(--digital);background:var(--digital-soft)}
+
+  /* ---- detail panel (screenshot thumbnails) ---- */
+  .panel{display:none;background:var(--panel);border:1px solid var(--line);border-radius:4px;overflow:hidden;margin-top:18px}
+  .panel.on{display:block}
+  .panel-head{padding:22px 24px;border-bottom:1px solid var(--line);border-top:4px solid var(--c)}
+  .panel-head h3{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:22px;letter-spacing:-.01em;display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;color:var(--c)}
+  .panel-head .pscore{font-family:'IBM Plex Mono',monospace;font-weight:600;font-size:20px;color:var(--ink)}
+  .panel-head .pscore small{color:var(--ink-3);font-size:12px}
+  .verdict{color:var(--ink-2);font-size:14px;max-width:80ch;margin-top:8px}
+  .shotgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:18px;padding:22px 24px 26px}
+  .shot-card{display:flex;flex-direction:column;gap:7px}
+  .shot-thumb{position:relative;display:block;width:100%;border:none;background:none;padding:0;cursor:zoom-in;border-radius:5px}
+  .shot-thumb img{width:100%;display:block;aspect-ratio:16/10;object-fit:cover;object-position:top;background:#fff;border:3px solid var(--line);border-radius:5px}
+  .shot-thumb.bad img{border-color:var(--offline)}
+  .shot-thumb.good img{border-color:var(--meas)}
+  .shot-thumb.bad{box-shadow:0 0 0 1px var(--offline)}
+  .shot-thumb:hover img{filter:brightness(.96)}
+  .shot-thumb.noimg img{display:none}
+  .shot-thumb.noimg::after{content:"screenshot missing";display:flex;align-items:center;justify-content:center;
+    aspect-ratio:16/10;border:2px dashed var(--line);border-radius:5px;color:var(--ink-3);font-family:'IBM Plex Mono',monospace;font-size:11px}
+  .shot-thumb.noimg.bad::after{border-color:var(--offline);color:var(--offline)}
+  .shot-d{position:absolute;top:9px;right:9px;font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;
+    padding:2px 7px;border-radius:3px;color:#fff;background:var(--ink-3)}
+  .shot-d.bad{background:var(--offline)} .shot-d.good{background:var(--meas)}
+  .shot-flag{position:absolute;top:9px;left:9px;font-family:'IBM Plex Mono',monospace;font-size:9.5px;font-weight:600;letter-spacing:.06em;
+    padding:2px 6px;border-radius:3px;background:var(--offline);color:#fff;text-transform:uppercase;display:none}
+  .shot-thumb.bad .shot-flag{display:inline-block}
+  figcaption{font-size:12px;color:var(--ink-2);line-height:1.4}
+  figcaption b{color:var(--ink);font-family:'Space Grotesk',sans-serif;font-weight:600}
+
+  table.mtab{width:100%;border-collapse:collapse}
+  table.mtab th,table.mtab td{text-align:left;padding:12px 18px;font-size:13.5px;border-bottom:1px solid var(--grid);vertical-align:top}
+  table.mtab th{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);font-weight:500}
+  table.mtab tr:last-child td{border-bottom:none}
+  .step-name{font-weight:500}
+  .step-note{color:var(--ink-2);font-size:13px}
+  #lightbox{display:none;position:fixed;inset:0;background:rgba(10,12,16,.86);z-index:50;align-items:center;justify-content:center;flex-direction:column;gap:14px;padding:30px;cursor:zoom-out}
+  #lightbox.on{display:flex}
+  #lb-img{max-width:92vw;max-height:78vh;border-radius:4px;background:#fff;box-shadow:0 20px 60px rgba(0,0,0,.5)}
+  #lb-cap{font-family:'IBM Plex Mono',monospace;font-size:13px;color:#f3f1ec;text-align:center;max-width:80vw}
+  #lb-miss{display:none;color:#f3f1ec;font-family:'IBM Plex Mono',monospace;font-size:14px;border:1px dashed #555;border-radius:4px;padding:40px 50px;text-align:center;line-height:1.7}
+  .tablecard{background:var(--panel);border:1px solid var(--line);border-radius:4px;overflow:hidden}
+  .mw{font-family:'IBM Plex Mono',monospace;font-weight:600;white-space:nowrap;text-align:right}
+  .mw.pos{color:var(--meas)} .mw.neg{color:var(--offline)}
+  .kpi-strip{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:18px}
+  .kpi{background:var(--panel);border:1px solid var(--line);border-left:3px solid var(--digital);border-radius:4px;padding:16px 18px}
+  .kpi h4{font-family:'Space Grotesk',sans-serif;font-size:15px;font-weight:600;margin-bottom:4px}
+  .kpi p{font-size:13px;color:var(--ink-2)}
+  .spec-list{list-style:none;border:1px solid var(--line);border-radius:4px;overflow:hidden;background:var(--panel)}
+  .spec-list li{display:flex;gap:16px;padding:13px 18px;border-bottom:1px solid var(--grid);font-size:13.5px}
+  .spec-list li:last-child{border-bottom:none}
+  .spec-list b{font-family:'IBM Plex Mono',monospace;font-weight:600;min-width:150px;color:var(--ink)}
+  .spec-list span{color:var(--ink-2)}
+  .formula{font-family:'IBM Plex Mono',monospace;background:var(--panel);border:1px solid var(--line);border-left:3px solid var(--digital);border-radius:4px;padding:16px 18px;font-size:14px;margin-bottom:10px}
+  footer{border-top:1px solid var(--line);padding:26px 0 60px;color:var(--ink-3);font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.02em}
+  @media (max-width:680px){.kpi-strip{grid-template-columns:1fr}.matrix .mx-note{font-size:11.5px}.tcol-name{font-size:14px}.spec-list b{min-width:0}}
+  @media (prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto}}
+  :focus-visible{outline:2px solid var(--digital);outline-offset:2px}
+  .chartbox{background:var(--panel);border:1px solid var(--line);border-radius:4px;padding:20px 22px;margin-bottom:16px}
+  .chartbox h3{font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:16px;margin-bottom:3px}
+  .chartbox p.cap{font-size:13px;color:var(--ink-2);margin-bottom:14px;max-width:78ch}
+  .chartbox svg{width:100%;height:auto}
+  .statgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
+  .stat{background:var(--panel);border:1px solid var(--line);border-radius:4px;padding:14px 16px}
+  .stat .lab{font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-3)}
+  .stat .val{font-family:'IBM Plex Mono',monospace;font-weight:600;font-size:17px;margin-top:5px}
+  .stat .val .down{color:var(--offline)} .stat .val .up{color:var(--meas)} .stat .val .arr{color:var(--ink-3);font-weight:400}
+  .stat .sub{font-size:11.5px;color:var(--ink-2);margin-top:4px}
+  .thesis{background:var(--panel);border:1px solid var(--line);border-left:3px solid var(--digital);border-radius:4px;padding:18px 20px;font-size:15px;color:var(--ink);max-width:80ch;margin-bottom:18px}
+.note-box strong{color:var(--ink)}
+.note-box{background:var(--panel);border:1px solid var(--line);border-left:3px solid var(--digital);border-radius:4px;padding:16px 20px;font-size:14px;line-height:1.55;color:var(--ink-2);max-width:80ch;margin-bottom:18px}
+  .thesis strong{color:var(--ink)}
+  .codeblock{background:var(--panel);border:1px solid var(--line);border-radius:4px;padding:14px 16px;font-family:'IBM Plex Mono',monospace;font-size:12px;line-height:1.6;color:var(--ink-2);overflow-x:auto;white-space:pre;margin:10px 0}
+  .codeblock .k{color:var(--digital)} .codeblock .c{color:var(--ink-3)}
+  .tabhead{padding:8px 0 14px;margin-bottom:22px;border-bottom:1px solid var(--line)}
+  .tabtitle{font-family:'Space Grotesk',sans-serif;font-weight:700;letter-spacing:-.02em;font-size:clamp(23px,3.3vw,33px);line-height:1.1;max-width:30ch;margin:0;color:var(--ink)}
+  .tabhead .sub{margin-top:12px}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <div class="tabbar" role="tablist">
+      <button class="tabbtn key active" id="tb-exec" role="tab" onclick="tab('exec')">Executive Summary</button>
+      <button class="tabbtn" id="tb-yepp" role="tab" onclick="tab('yepp')">Yepp Diagnostics (Task 1)</button>
+      <button class="tabbtn" id="tb-app" role="tab" onclick="tab('app')">Yettel App Diagnostics (Task 2)</button>
+      <button class="tabbtn" id="tb-friction" role="tab" onclick="tab('friction')">Digital Sales Friction (Web) (Task 2)</button>
+      <button class="tabbtn" id="tb-seo" role="tab" onclick="tab('seo')">SEO (Web) (Task 2)</button>
+      <button class="tabbtn" id="tb-geo" role="tab" onclick="tab('geo')">GEO (Web) (Task 2)</button>
+      <button class="tabbtn key" id="tb-actions" role="tab" onclick="tab('actions')">Actions</button>
+      <button class="tabbtn" id="tb-methodology" role="tab" onclick="tab('methodology')">Methodology</button>
+    </div>
+  </div>
+</header>
+
+<!-- ============ EXECUTIVE SUMMARY ============ -->
+<div class="tabpane on" id="tab-exec"><div class="wrap">
+  <section class="tabhead"><div class="eyebrow">Executive Summary</div><h2 class="tabtitle" style="max-width:46ch;font-size:clamp(21px,2.8vw,29px)">Yettel’s digital funnels are competitive but leaking — making friction removal the primary driver of both growth and NPS uplift</h2></section>
+  <section>
+    <div class="panel on" style="--c:#00a15f">
+      <div class="panel-head"><h3>The two tasks</h3></div>
+      <ul class="spec-list" style="border:none">
+        <li><b style="min-width:46px;color:var(--c)">Task 1</b><span><strong>Scale Yepp</strong> — turn Yettel’s app-only, digital-first plan into a profitable acquisition engine rather than a leaky one.</span></li>
+        <li><b style="min-width:46px;color:var(--c)">Task 2</b><span><strong>Digital transformation</strong> — lift NPS and cut cost-per-transaction while moving digital &amp; assisted sales from <strong>20% to 50% by 2028</strong>.</span></li>
+      </ul>
+    </div>
+  </section>
+
+  <section>
+    <div class="slabel">What the data suggest: Task 1</div>
+    <div class="thesis">Yepp’s problem is <strong>retention, not acquisition</strong>: activations hold steady (~3,100/mo) while net adds collapse from ~2,700 to ~600 and only <strong>48% of ever-registered users remain active</strong>. The biggest lever is <strong>payment recovery, not marketing</strong>: 38% of churn is involuntary — <strong>these customers don’t want to leave, the system drops them</strong> when a monthly auto-charge fails (expired card, no funds, declined SCA) — and the Android cohort compounds it, churning near twice the iOS rate (9.2% vs 5.1%) on a platform holding 44% of the base. Churn is front-loaded in the first 90 days. <strong>Plugging the leak and reallocating spend beats buying more activations.</strong></div>
+    </section>
+
+  <section>
+    <div style="display:flex;gap:26px;flex-wrap:wrap;align-items:flex-start">
+    <div style="flex:1.55 1 0;min-width:330px">
+      <div class="slabel" style="min-height:34px">Where Yepp leaks — the lifetime funnel</div>
+    <div style="width:100%;margin:8px auto 0">
+    <svg viewBox="0 0 720 540" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;font-family:'Inter',sans-serif">
+      <defs>
+        <linearGradient id="funGrad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#2f54eb"/>
+          <stop offset="52%" stop-color="#2b86c5"/>
+          <stop offset="100%" stop-color="#00a15f"/>
+        </linearGradient>
+      </defs>
+
+      <!-- leak drip triangles (both sides) -->
+      <g fill="#d4451f">
+        <polygon points="372.3,173 372.3,187 389,180"/><polygon points="127.7,173 127.7,187 111,180"/>
+        <polygon points="344.4,283 344.4,297 361,290"/><polygon points="155.6,283 155.6,297 139,290"/>
+        <polygon points="322.4,393 322.4,407 339,400"/><polygon points="177.6,393 177.6,407 161,400"/>
+      </g>
+
+      <!-- funnel body -->
+      <path d="M100,70 L400,70 L372.3,180 L344.4,290 L322.4,400 L283,462 L217,462 L177.6,400 L155.6,290 L127.7,180 Z" fill="url(#funGrad)"/>
+      <!-- stage dividers -->
+      <g stroke="#ffffff" stroke-opacity="0.45" stroke-width="1">
+        <line x1="127.7" y1="180" x2="372.3" y2="180"/>
+        <line x1="155.6" y1="290" x2="344.4" y2="290"/>
+        <line x1="177.6" y1="400" x2="322.4" y2="400"/>
+      </g>
+
+      <!-- in-band labels -->
+      <g text-anchor="middle" fill="#ffffff" font-family="'Space Grotesk',sans-serif">
+        <text x="250" y="118" font-size="23" font-weight="700">88,650</text>
+        <text x="250" y="137" font-size="11" fill-opacity="0.92" font-family="'Inter',sans-serif">registrations · 100%</text>
+        <text x="250" y="230" font-size="21" font-weight="700">72,295</text>
+        <text x="250" y="248" font-size="11" fill-opacity="0.92" font-family="'Inter',sans-serif">completed trial · 82%</text>
+        <text x="250" y="340" font-size="19" font-weight="700">55,800</text>
+        <text x="250" y="357" font-size="11" fill-opacity="0.92" font-family="'Inter',sans-serif">paid 1st fee · 63%</text>
+        <text x="250" y="431" font-size="15" font-weight="700">42,800</text>
+        <text x="250" y="446" font-size="9.5" fill-opacity="0.92" font-family="'Inter',sans-serif">active · 48%</text>
+      </g>
+
+      <!-- leak callouts (right) -->
+      <g stroke="#d4451f" stroke-width="1.4">
+        <line x1="389" y1="180" x2="430" y2="180"/>
+        <line x1="361" y1="290" x2="430" y2="290"/>
+        <line x1="339" y1="400" x2="430" y2="400"/>
+      </g>
+      <g font-family="'Space Grotesk',sans-serif" font-weight="700" fill="#d4451f" font-size="16">
+        <text x="438" y="176">−16,355</text>
+        <text x="438" y="286">−16,495</text>
+        <text x="438" y="396">−13,000</text>
+      </g>
+      <g font-family="'Inter',sans-serif" fill="var(--ink-3)" font-size="11.5">
+        <text x="438" y="192">onboarding / activation drop · −18%</text>
+        <text x="438" y="302">trial → paid not converted · −23%</text>
+        <text x="438" y="412">churn · −23% — 38% involuntary, worse on Android</text>
+        <text x="438" y="427" fill="#d4451f" font-weight="700" font-size="10.5" font-family="'IBM Plex Mono',monospace">★ THE BIGGEST FIXABLE LEAK</text>
+      </g>
+
+      <!-- stage names (left) -->
+      <g text-anchor="end" font-family="'IBM Plex Mono',monospace" fill="var(--ink-3)" font-size="11" letter-spacing="0.04em">
+        <text x="92" y="124">REGISTERED</text>
+        <text x="92" y="234">TRIAL DONE</text>
+        <text x="92" y="344">FIRST PAID</text>
+        <text x="92" y="430">ACTIVE</text>
+      </g>
+
+      <!-- output spout -->
+      <line x1="250" y1="462" x2="250" y2="486" stroke="#00a15f" stroke-width="1.6"/>
+      <polygon points="250,492 245,484 255,484" fill="#00a15f"/>
+      <text x="250" y="510" text-anchor="middle" fill="#00a15f" font-weight="700" font-size="14" font-family="'Space Grotesk',sans-serif">42,800 active · 48.3% retained</text>
+      <text x="250" y="527" text-anchor="middle" fill="var(--ink-3)" font-size="11" font-family="'Inter',sans-serif">the survivors are ~3.6× stickier — the funnel’s only paying output</text>
+    </svg>
+    </div>
+    <p class="mx-hint">Of <strong>88,650</strong> who ever registered, only <strong>42,800 (48.3%)</strong> are active today — <strong>more than half spills out</strong>. The two upper leaks (onboarding, trial→paid) are roughly equal in size, but the <strong>bottom leak is the most fixable</strong>: a large share of it is involuntary churn from failed auto-charges, concentrated on Android. Plug the leaks before buying more registrations.</p>
+    </div>
+    <div style="flex:1 1 0;min-width:280px">
+      <div class="slabel" style="min-height:34px">When Yepp leaks — the first-90-day cliff</div>
+      <div style="width:100%;margin:8px auto 0">
+      <svg viewBox="0 0 330 384" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto">
+        <text x="58" y="42" text-anchor="middle" font-family="'IBM Plex Mono',monospace" font-size="10" fill="var(--ink-3)">DAY 0 · SIGNUP</text>
+        <line x1="58" y1="52" x2="58" y2="352" stroke="var(--ink-3)" stroke-width="2" stroke-dasharray="2 6"/>
+        <polygon points="52,354 64,354 58,366" fill="var(--ink-3)"/>
+        <text x="84" y="70" font-family="'IBM Plex Mono',monospace" font-size="9.5" font-weight="700" fill="#cf3a17">▼ FIRST 90 DAYS — THE CLIFF</text>
+        <g font-family="'IBM Plex Mono',monospace" font-size="10.5" fill="var(--ink-2)" text-anchor="end">
+          <text x="49" y="92">0–3 mo</text>
+          <text x="49" y="156">3–6 mo</text>
+          <text x="49" y="220">6–12 mo</text>
+          <text x="49" y="304">12+ mo</text>
+        </g>
+        <g>
+          <circle cx="58" cy="88" r="5" fill="#cf3a17"/>
+          <circle cx="58" cy="152" r="5" fill="#e0541f"/>
+          <circle cx="58" cy="216" r="5" fill="#ec8b5e"/>
+          <circle cx="58" cy="300" r="5" fill="#00a15f"/>
+        </g>
+        <rect x="66" y="75"  width="224" height="26" rx="3" fill="#cf3a17"/>
+        <rect x="66" y="139" width="148" height="26" rx="3" fill="#e0541f"/>
+        <rect x="66" y="203" width="104" height="26" rx="3" fill="#ec8b5e"/>
+        <rect x="66" y="287" width="62"  height="26" rx="3" fill="#00a15f"/>
+        <g font-family="'Space Grotesk',sans-serif" font-weight="700" font-size="14" fill="var(--ink)">
+          <text x="296" y="93" fill="#cf3a17">11.2%</text>
+          <text x="220" y="157">7.4%</text>
+          <text x="176" y="221">5.2%</text>
+          <text x="134" y="305">3.1%</text>
+        </g>
+        <text x="66" y="328" font-family="'IBM Plex Mono',monospace" font-size="9.5" font-weight="700" fill="#00a15f">✓ STABILISED — ~3.6× STICKIER</text>
+      </svg>
+      </div>
+      <p class="mx-hint">Monthly churn is <strong>front-loaded</strong> — 11.2% in the first 90 days vs 3.1% after a year. Win the first quarter with onboarding, not discounts — the customer becomes ~3.6× stickier. This window decides LTV.</p>
+    </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="slabel">Usage &amp; engagement — the product experience is degrading (Jun → May)</div>
+    <div style="width:100%;margin:6px 0 0">
+      <svg viewBox="0 0 1040 296" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto">
+      <text x="470" y="20" font-family="'IBM Plex Mono',monospace" font-size="10" fill="var(--ink-3)">DEGRADATION (Jun → May) →</text>
+      <text x="8" y="48" font-family="'Inter',sans-serif" font-size="13.5" fill="var(--ink)">App crash rate</text>
+      <text x="250" y="48" font-family="'IBM Plex Mono',monospace" font-size="12.5"><tspan fill="var(--ink-3)">1.2%</tspan><tspan fill="var(--ink-3)"> → </tspan><tspan fill="#c0341a" font-weight="700">3.5%</tspan></text>
+      <rect x="470" y="33" width="441.6" height="22" rx="3" fill="#c0341a"/>
+      <text x="921.6" y="48" font-family="'IBM Plex Mono',monospace" font-size="12.5" font-weight="700" fill="#c0341a">↑ +192%  <tspan fill="var(--ink-3)" font-weight="400">· ≈3× worse</tspan></text>
+      <text x="8" y="90" font-family="'Inter',sans-serif" font-size="13.5" fill="var(--ink)">Avg page load</text>
+      <text x="250" y="90" font-family="'IBM Plex Mono',monospace" font-size="12.5"><tspan fill="var(--ink-3)">1.8s</tspan><tspan fill="var(--ink-3)"> → </tspan><tspan fill="#e0541f" font-weight="700">2.9s</tspan></text>
+      <rect x="470" y="75" width="140.3" height="22" rx="3" fill="#e0541f"/>
+      <text x="620.3" y="90" font-family="'IBM Plex Mono',monospace" font-size="12.5" font-weight="700" fill="#e0541f">↑ +61%</text>
+      <text x="8" y="132" font-family="'Inter',sans-serif" font-size="13.5" fill="var(--ink)">Monthly sessions / user</text>
+      <text x="250" y="132" font-family="'IBM Plex Mono',monospace" font-size="12.5"><tspan fill="var(--ink-3)">18.5</tspan><tspan fill="var(--ink-3)"> → </tspan><tspan fill="#e0541f" font-weight="700">12.1</tspan></text>
+      <rect x="470" y="117" width="80.5" height="22" rx="3" fill="#e0541f"/>
+      <text x="560.5" y="132" font-family="'IBM Plex Mono',monospace" font-size="12.5" font-weight="700" fill="#e0541f">↓ −35%</text>
+      <text x="8" y="174" font-family="'Inter',sans-serif" font-size="13.5" fill="var(--ink)">Avg session duration</text>
+      <text x="250" y="174" font-family="'IBM Plex Mono',monospace" font-size="12.5"><tspan fill="var(--ink-3)">4.2 min</tspan><tspan fill="var(--ink-3)"> → </tspan><tspan fill="#e0541f" font-weight="700">2.8 min</tspan></text>
+      <rect x="470" y="159" width="75.9" height="22" rx="3" fill="#e0541f"/>
+      <text x="555.9" y="174" font-family="'IBM Plex Mono',monospace" font-size="12.5" font-weight="700" fill="#e0541f">↓ −33%</text>
+      <text x="8" y="216" font-family="'Inter',sans-serif" font-size="13.5" fill="var(--ink)">Voice add-on buyers</text>
+      <text x="250" y="216" font-family="'IBM Plex Mono',monospace" font-size="12.5"><tspan fill="var(--ink-3)">44%</tspan><tspan fill="var(--ink-3)"> → </tspan><tspan fill="#e0541f" font-weight="700">34%</tspan></text>
+      <rect x="470" y="201" width="52.9" height="22" rx="3" fill="#e0541f"/>
+      <text x="532.9" y="216" font-family="'IBM Plex Mono',monospace" font-size="12.5" font-weight="700" fill="#e0541f">↓ −23%</text>
+      <text x="8" y="258" font-family="'Inter',sans-serif" font-size="13.5" fill="var(--ink)">App store rating</text>
+      <text x="250" y="258" font-family="'IBM Plex Mono',monospace" font-size="12.5"><tspan fill="var(--ink-3)">4.2</tspan><tspan fill="var(--ink-3)"> → </tspan><tspan fill="#e0541f" font-weight="700">3.9</tspan></text>
+      <rect x="470" y="243" width="16.1" height="22" rx="3" fill="#e0541f"/>
+      <text x="496.1" y="258" font-family="'IBM Plex Mono',monospace" font-size="12.5" font-weight="700" fill="#e0541f">↓ −7%</text>
+      </svg>
+    </div>
+    <p class="mx-hint">Every product-health metric moved the wrong way in a single cohort window: sessions and session length fell by a third, the <strong>crash rate nearly tripled (1.2% → 3.5%)</strong>, pages load slower, the store rating slipped 4.2 → 3.9, and voice add-on attach dropped 44% → 34%. Degrading reliability is upstream of the churn — a crashing app and a falling rating feed the leak, and the decay is worst on Android.</p>
+  </section>
+
+  <section>
+    <div class="slabel">Channel economics — the Campaign mis-allocation</div>
+    <div style="width:100%;margin:6px 0 0">
+      <svg viewBox="0 0 1040 244" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto">
+      <text x="150" y="20" font-family="'IBM Plex Mono',monospace" font-size="10" fill="var(--ink-3)">COST PER 6-MONTH-RETAINED CUSTOMER (HUF) →</text>
+      <text x="8" y="50" font-family="'IBM Plex Mono',monospace" font-size="12.5" fill="var(--ink)">Referral</text>
+      <rect x="150" y="33" width="44.3" height="26" rx="3" fill="#00a15f"/>
+      <text x="204.3" y="50" font-family="'IBM Plex Mono',monospace" font-size="13" font-weight="700" fill="var(--ink)">2,059 HUF  <tspan fill="#00a15f" font-weight="400" font-size="11.5">· unicorn — cheapest &amp; stickiest, yet under-used</tspan></text>
+      <text x="8" y="90" font-family="'IBM Plex Mono',monospace" font-size="12.5" fill="var(--ink)">Organic</text>
+      <rect x="150" y="73" width="78.0" height="26" rx="3" fill="#00a15f"/>
+      <text x="238.0" y="90" font-family="'IBM Plex Mono',monospace" font-size="13" font-weight="700" fill="var(--ink)">3,621 HUF</text>
+      <text x="8" y="130" font-family="'IBM Plex Mono',monospace" font-size="12.5" fill="var(--ink)">Partner</text>
+      <rect x="150" y="113" width="161.5" height="26" rx="3" fill="#c98a1f"/>
+      <text x="321.5" y="130" font-family="'IBM Plex Mono',monospace" font-size="13" font-weight="700" fill="var(--ink)">7,500 HUF</text>
+      <text x="8" y="170" font-family="'IBM Plex Mono',monospace" font-size="12.5" fill="var(--ink)">Retail</text>
+      <rect x="150" y="153" width="294.7" height="26" rx="3" fill="#e0541f"/>
+      <text x="454.7" y="170" font-family="'IBM Plex Mono',monospace" font-size="13" font-weight="700" fill="var(--ink)">13,684 HUF</text>
+      <text x="8" y="210" font-family="'IBM Plex Mono',monospace" font-size="12.5" fill="var(--ink)">Campaign</text>
+      <rect x="150" y="193" width="600.0" height="26" rx="3" fill="#c0341a"/>
+      <text x="760.0" y="210" font-family="'IBM Plex Mono',monospace" font-size="13" font-weight="700" fill="var(--ink)">27,857 HUF  <tspan fill="#c0341a" font-weight="400" font-size="11.5">· ~13.5× Referral · also the worst retention</tspan></text>
+      </svg>
+    </div>
+    <p class="mx-hint"><strong>Campaign is simultaneously the most expensive CPA and the worst retention</strong> — a retained customer costs ~13.5× what it does on Referral. <strong>Referral is the unicorn</strong>: cheapest and stickiest (84% conversion, 68% 6-month retention, 6,680 ARPU) — yet under-funded. A textbook mis-allocation: spend is flowing to the channel that returns the least.</p>
+  </section>
+
+
+  <section>
+    <div class="slabel">Task 1 — Scale Yepp · five-point strategy</div>
+    <div class="panel on" style="--c:#00a15f">
+      <div class="panel-head"><h3>Plug the leak before buying growth</h3></div>
+      <ul class="spec-list" style="border:none">
+        <li><b style="min-width:26px;color:var(--c)">1</b><span><strong>Payment recovery.</strong> Ship smart-retry timing, an automated dunning sequence, proactive card-update prompts and an alternative-payment fallback to win back failed auto-charges.</span></li>
+        <li><b style="min-width:26px;color:var(--c)">2</b><span><strong>Android stabilization.</strong> Run a crash-triage and performance sprint on the Android build, with QA on low-end devices, to close the platform gap.</span></li>
+        <li><b style="min-width:26px;color:var(--c)">3</b><span><strong>First-90-day onboarding.</strong> Redesign activation — guided first-run, early-value moments, habit nudges and a save-the-cancel flow through the first quarter.</span></li>
+        <li><b style="min-width:26px;color:var(--c)">4</b><span><strong>Channel reallocation.</strong> Shift budget out of Campaign and Retail into Referral and Organic, and stand up a member-get-member referral engine.</span></li>
+        <li><b style="min-width:26px;color:var(--c)">5</b><span><strong>In-app signup friction.</strong> Streamline the KYC + card-on-file step — document-scan pre-fill, deferred fields, a smoother SCA hand-off and instant eSIM by default.</span></li>
+      </ul>
+    </div>
+  </section>
+
+  <section>
+    <div class="slabel">What the data suggest: Task 2</div>
+    <div class="thesis">Across the web Yettel is competitive on every lens: a <strong>close second after One on checkout friction</strong>, the <strong>SEO leader on content depth</strong>, and <strong>second on AI visibility</strong>, where it already owns the high-intent 0-Ft / eSIM / online-buying queries. In the app it holds the <strong>best-rated Android build of the three (4.1★)</strong> with the smallest cross-platform gap, yet its measured #1 complaint is <strong>auth / login (29% of negative reviews)</strong> plus a live Telenor→Yettel migration tail (15%) — and the app is still mostly self-service, with Yepp the only in-app acquisition. The Yettel digital channels nearly win the top of the funnel; the gap to 50% is <strong>conversion and friction, not visibility</strong> — fix checkout, auth/login and in-app commerce and the traffic Yettel already attracts converts.</div>
+    <div style="display:flex;gap:18px;flex-wrap:wrap;margin-top:6px">
+
+      <div class="chartbox" style="flex:1 1 320px;min-width:300px;margin-bottom:0">
+        <h3>Website friction</h3>
+        <p class="cap">iPhone-16 new-customer checkout · score /100 — Yettel a close second</p>
+        <svg viewBox="0 0 360 182" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto">
+          <g font-family="'IBM Plex Mono',monospace" font-size="12">
+            <text x="6" y="48" fill="var(--ink-2)">1 · One</text>
+            <text x="6" y="100" fill="var(--ink)" font-weight="600">2 · Yettel</text>
+            <text x="6" y="152" fill="var(--ink-2)">3 · Telekom</text>
+          </g>
+          <rect x="92" y="29" width="200.6" height="30" rx="3" fill="#6c3fc5"/>
+          <rect x="92" y="81" width="198.2" height="30" rx="3" fill="#00a15f" stroke="var(--ink)" stroke-width="1.6"/>
+          <rect x="92" y="133" width="186.4" height="30" rx="3" fill="#e20074"/>
+          <g font-family="'Space Grotesk',sans-serif" font-weight="700" font-size="19" fill="var(--ink)">
+            <text x="300" y="50">85</text>
+            <text x="298" y="102">84</text>
+            <text x="286" y="154">79</text>
+          </g>
+        </svg>
+      </div>
+
+      <div class="chartbox" style="flex:1 1 320px;min-width:300px;margin-bottom:0">
+        <h3>App complaints</h3>
+        <p class="cap">Yettel · share of 304 negative Play reviews — auth/login dominates</p>
+        <svg viewBox="0 0 360 236" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto">
+          <g font-family="'IBM Plex Mono',monospace" font-size="11" fill="var(--ink-2)">
+            <text x="6" y="34" fill="var(--ink)" font-weight="600">Auth / login</text>
+            <text x="6" y="70">Crash / perf</text>
+            <text x="6" y="106">Billing</text>
+            <text x="6" y="142">Migration</text>
+            <text x="6" y="178">Web shell</text>
+            <text x="6" y="214">Localization</text>
+          </g>
+          <rect x="104" y="18"  width="189.5" height="24" rx="3" fill="#cf3a17"/>
+          <rect x="104" y="54"  width="104.5" height="24" rx="3" fill="#e0541f"/>
+          <rect x="104" y="90"  width="104.5" height="24" rx="3" fill="#e0541f"/>
+          <rect x="104" y="126" width="98"    height="24" rx="3" fill="#ec8b5e"/>
+          <rect x="104" y="162" width="52.3"  height="24" rx="3" fill="#9c9c9c"/>
+          <rect x="104" y="198" width="6.5"   height="24" rx="3" fill="#b9b9b9"/>
+          <g font-family="'Space Grotesk',sans-serif" font-weight="700" font-size="14" fill="var(--ink)">
+            <text x="299" y="38" fill="#cf3a17">29%</text>
+            <text x="214" y="74">16%</text>
+            <text x="214" y="110">16%</text>
+            <text x="208" y="146">15%</text>
+            <text x="162" y="182">8%</text>
+            <text x="116" y="218">1%</text>
+          </g>
+        </svg>
+      </div>
+
+    </div>
+  
+    <div style="display:flex;gap:18px;flex-wrap:wrap;margin-top:18px">
+
+      <div class="chartbox" style="flex:1 1 320px;min-width:300px;margin-bottom:0">
+        <h3>SEO (Web)</h3>
+        <p class="cap">Observational read /100 — Yettel content lead, Telekom template leak, One rebrand risk</p>
+        <svg viewBox="0 0 360 182" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto">
+          <text x="6" y="48" font-family="'IBM Plex Mono',monospace" font-size="12" fill="var(--ink)" font-weight="600">1 · Yettel</text>
+          <rect x="92" y="29" width="172.0" height="30" rx="3" fill="#00a15f" stroke="var(--ink)" stroke-width="1.6"/>
+          <text x="272.0" y="50" font-family="'Space Grotesk',sans-serif" font-weight="700" font-size="19" fill="var(--ink)">86</text>
+          <text x="6" y="100" font-family="'IBM Plex Mono',monospace" font-size="12" fill="var(--ink-2)" font-weight="400">2 · Telekom</text>
+          <rect x="92" y="81" width="164.0" height="30" rx="3" fill="#e20074"/>
+          <text x="264.0" y="102" font-family="'Space Grotesk',sans-serif" font-weight="700" font-size="19" fill="var(--ink)">82</text>
+          <text x="6" y="152" font-family="'IBM Plex Mono',monospace" font-size="12" fill="var(--ink-2)" font-weight="400">3 · One</text>
+          <rect x="92" y="133" width="148.0" height="30" rx="3" fill="#6c3fc5"/>
+          <text x="248.0" y="154" font-family="'Space Grotesk',sans-serif" font-weight="700" font-size="19" fill="var(--ink)">74</text>
+          </svg>
+      </div>
+
+      <div class="chartbox" style="flex:1 1 320px;min-width:300px;margin-bottom:0">
+        <h3>GEO (Web)</h3>
+        <p class="cap">AI-answer visibility on purchase-intent queries — Yettel ties Telekom and they split the #1 spots 5–5; One is shut out</p>
+        <svg viewBox="0 0 360 200" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto">
+          <text x="6" y="12" font-family="'IBM Plex Mono',monospace" font-size="10" fill="var(--ink-3)">AI-ANSWER VISIBILITY · AVG /100</text>
+          <text x="6" y="40" font-family="'IBM Plex Mono',monospace" font-size="11.5" fill="var(--ink-2)">Telekom</text>
+          <rect x="78" y="26" width="158.1" height="20" rx="3" fill="#e20074"/>
+          <text x="244.1" y="41" font-family="'Space Grotesk',sans-serif" font-weight="700" font-size="15" fill="var(--ink)">76</text>
+          <text x="6" y="70" font-family="'IBM Plex Mono',monospace" font-size="11.5" fill="var(--ink-2)">Yettel</text>
+          <rect x="78" y="56" width="156.0" height="20" rx="3" fill="#00a15f"/>
+          <text x="242.0" y="71" font-family="'Space Grotesk',sans-serif" font-weight="700" font-size="15" fill="var(--ink)">75</text>
+          <text x="6" y="100" font-family="'IBM Plex Mono',monospace" font-size="11.5" fill="var(--ink-2)">One</text>
+          <rect x="78" y="86" width="112.3" height="20" rx="3" fill="#6c3fc5"/>
+          <text x="198.3" y="101" font-family="'Space Grotesk',sans-serif" font-weight="700" font-size="15" fill="var(--ink)">54</text>
+          <text x="6" y="146" font-family="'IBM Plex Mono',monospace" font-size="10" fill="var(--ink-3)">QUERY LEADS · RANKS #1 OF 10</text>
+          <rect x="8" y="156" width="170" height="28" rx="3" fill="#00a15f"/>
+          <rect x="182" y="156" width="170" height="28" rx="3" fill="#e20074"/>
+          <text x="93" y="174" text-anchor="middle" font-family="'IBM Plex Mono',monospace" font-size="12" font-weight="700" fill="#fff">Yettel · 5</text>
+          <text x="267" y="174" text-anchor="middle" font-family="'IBM Plex Mono',monospace" font-size="12" font-weight="700" fill="#fff">Telekom · 5</text>
+          <text x="8" y="197" font-family="'IBM Plex Mono',monospace" font-size="10" fill="var(--ink-3)">One: 0 of 10 — sources still cite “Vodafone”</text>
+          </svg>
+      </div>
+
+    </div>
+  </section>
+
+  <section>
+    <div class="slabel">Task 2 — Digital transformation · five-point strategy</div>
+    <div class="panel on" style="--c:#1f4fff">
+      <div class="panel-head"><h3>Convert the traffic you already win — 20%→50% by 2028</h3></div>
+      <ul class="spec-list" style="border:none">
+        <li><b style="min-width:26px;color:var(--c)">1</b><span><strong>Friction reduction as the NPS engine.</strong> Run friction removal as a standing programme across web checkout and the in-app auth / login / payment journeys, measured by step-level drop-off.</span></li>
+        <li><b style="min-width:26px;color:var(--c)">2</b><span><strong>Make the app a sales channel, not just self-service.</strong> Extend Yepp's app-only acquisition pattern (KYC + port-in + saved card + eSIM) to device-plus-plan purchase and tariff changes, which are still web-only today.</span></li>
+        <li><b style="min-width:26px;color:var(--c)">3</b><span><strong>Assisted-digital in retail &amp; care.</strong> Give agents co-browse and in-store tablet checkout so human-assisted journeys complete digitally instead of dropping back to paper or a return visit.</span></li>
+        <li><b style="min-width:26px;color:var(--c)">4</b><span><strong>Convert the top-of-funnel lead.</strong> Fix the device-page template leak and build more purchase-intent landing pages so search and AI-answer visibility turn into digital orders.</span></li>
+        <li><b style="min-width:26px;color:var(--c)">5</b><span><strong>Outcome ownership &amp; measurement.</strong> Stand up a cost-per-transaction + digital-share dashboard with revenue attribution, governed weekly against a target line.</span></li>
+      </ul>
+    </div>
+  </section>
+</div></div>
+
+<!-- ============ YEPP DIAGNOSTICS ============ -->
+<div class="tabpane" id="tab-yepp"><div class="wrap">
+  <section class="tabhead"><div class="eyebrow">Yepp Diagnostics (Task 1)</div><h2 class="tabtitle">A leak problem disguised as growth</h2><p class="sub">Activations hold steady while net adds collapsed ~2,700→600/mo and only 48% of ever-registered users are still active; 38% of churn is involuntary — a payment-recovery fix, not a marketing one.</p></section>
+  <section>
+    <div class="slabel">Task 1 · Scale Yepp — the leak behind the growth</div>
+    <div class="thesis">Yepp doesn’t have a growth problem; it has a <strong>leak problem disguised as growth</strong>. “3,000+ activations/month” hides the fact that net growth has dried up: activations hold at ~2,800–3,800, but monthly net adds fell from ~2,700 (Sep–Oct) to ~600 (May), and growth efficiency (net adds ÷ activations) collapsed <strong>79% → 19%</strong>. Today roughly 4 of every 5 acquired customers leak straight back out.</div>
+    <div class="statgrid">
+      <div class="stat"><div class="lab">Growth efficiency</div><div class="val"><span class="arr">79% →</span> <span class="down">19%</span></div><div class="sub">net adds ÷ activations</div></div>
+      <div class="stat"><div class="lab">Still alive today</div><div class="val"><span class="down">48.3%</span></div><div class="sub">of everyone who ever registered</div></div>
+      <div class="stat"><div class="lab">Monthly churn</div><div class="val"><span class="arr">4.8% →</span> <span class="down">6.8%</span></div><div class="sub">Jun ’25 → May ’26</div></div>
+      <div class="stat"><div class="lab">Payment success (1st)</div><div class="val"><span class="arr">94% →</span> <span class="down">86%</span></div><div class="sub">the causal chain into churn</div></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="slabel">Where the customers go</div>
+    <div class="chartbox"><h3>Lifetime sales funnel</h3><p class="cap">Of everyone who ever registered, only 48.3% are active today — more than half the registrations are already lost.</p><div id="yepp-funnel"></div></div>
+    <div class="chartbox"><h3>Churn is front-loaded — the battle is the first 90 days</h3><p class="cap">Monthly churn by tenure cohort. Survive the first quarter and churn more than halves; meanwhile ARPU rises 5,850 → 6,820 HUF and add-on attach 38% → 58% with tenure. Early survivors are ~3.6× stickier and far more valuable.</p><div id="yepp-tenure"></div></div>
+  </section>
+
+  <section>
+    <div class="slabel">The single biggest lever — involuntary churn</div>
+    <div class="thesis" style="border-left-color:var(--digital)"><strong style="color:var(--digital)">38% of churn is involuntary</strong> — a failed auto-charge, not a customer who chose to leave (expired/replaced card, insufficient funds on charge day for a Gen-Z base, or bank / 3DS-SCA decline). The 94%→86% slide in 1st-attempt payment success directly feeds it. This is fixable at the <strong style="color:var(--digital)">payment / dunning layer</strong> (smart retries, card-update prompts, alternative payment) — not with marketing.</div>
+  </section>
+
+  <section>
+    <div class="slabel">Android is effectively broken</div>
+    <div class="mxwrap"><table class="matrix">
+      <tr><th class="mx-stage">Platform (May ’26)</th>
+        <th><div class="tcol-head" style="--c:#00a15f;cursor:default"><span class="tcol-name">iOS</span><span class="tcol-score">56%<small> of base</small></span></div></th>
+        <th><div class="tcol-head" style="--c:#e0541f;cursor:default"><span class="tcol-name">Android</span><span class="tcol-score">44%<small> of base</small></span></div></th></tr>
+      <tr><td class="mx-stage">Monthly churn</td><td class="mx-cell"><span class="gb pos">5.1%</span></td><td class="mx-cell"><span class="gb weak">9.2%</span></td></tr>
+      <tr><td class="mx-stage">Crash rate</td><td class="mx-cell"><span class="gb pos">1.8%</span></td><td class="mx-cell"><span class="gb weak">5.8%</span></td></tr>
+      <tr><td class="mx-stage">NPS</td><td class="mx-cell"><span class="gb pos">28</span></td><td class="mx-cell"><span class="gb weak">14</span></td></tr>
+      <tr><td class="mx-stage">Sessions / user</td><td class="mx-cell"><span class="gb pos">14.2</span></td><td class="mx-cell"><span class="gb weak">9.4</span></td></tr>
+    </table></div>
+    <p class="mx-hint">~1.8× churn, ~3× crashes, half the NPS — and 44% of the base sits here. One stabilization workstream → disproportionate churn savings.</p>
+  </section>
+
+  <section>
+    <div class="slabel">Capital is mis-allocated across channels</div>
+    <div class="chartbox"><h3>Cost per customer still retained at 6 months</h3><p class="cap">CPA ÷ 6-month retention. Campaign (TV/Digital) is both the priciest acquisition and the worst retention — a retained customer costs ~13.5× a Referral one. Referral is the unicorn (cheapest + stickiest) yet under-used: classic mis-allocation.</p><div id="yepp-channels"></div></div>
+  </section>
+
+  <section>
+    <div class="slabel">Product experience is eroding (leading indicators of churn)</div>
+    <div class="statgrid">
+      <div class="stat"><div class="lab">App sessions / user</div><div class="val"><span class="arr">18.5 →</span> <span class="down">12.1</span></div><div class="sub">−35%</div></div>
+      <div class="stat"><div class="lab">Crash rate</div><div class="val"><span class="arr">1.2% →</span> <span class="down">3.5%</span></div><div class="sub">~3×</div></div>
+      <div class="stat"><div class="lab">Avg page load</div><div class="val"><span class="arr">1.8s →</span> <span class="down">2.9s</span></div><div class="sub">slower</div></div>
+      <div class="stat"><div class="lab">App Store rating</div><div class="val"><span class="arr">4.2 →</span> <span class="down">3.9</span></div><div class="sub">in-app (Yepp cohort)</div></div>
+      <div class="stat"><div class="lab">Trial → Paid</div><div class="val"><span class="arr">0.72 →</span> <span class="down">0.65</span></div><div class="sub">steep from Apr</div></div>
+      <div class="stat"><div class="lab">Add-on attach</div><div class="val"><span class="arr">0.55 →</span> <span class="down">0.45</span></div><div class="sub">less monetisation</div></div>
+    </div>
+    <p class="mx-hint">Caveat: the latest week’s 0.20 conversion is almost certainly billing-report lag, not a collapse — the trend is down, but not that sharply.</p>
+  </section>
+</div></div>
+
+<!-- ============ FRICTION ============ -->
+<div class="tabpane" id="tab-friction"><div class="wrap">
+  <section class="tabhead"><div class="eyebrow">Digital Sales Friction (Web) (Task 2)</div><h2 class="tabtitle">A close second — one point off the lead, no offline cliff</h2><p class="sub">On the iPhone-16 new-customer journey Yettel scores 84 (One 85, Telekom 79); its real edge is a genuine guest path, its drag a 10-step checkout.</p></section>
+  <section>
+    <div class="slabel">The friction-loss journey</div>
+    <div class="chart-card">
+      <div class="chart-title">100 minus every friction point, step by step</div>
+      <p class="chart-note">Each line starts at 100 and loses points wherever the journey adds friction. Steeper drops = worse moments. The y-axis is zoomed to 60–100 so the gaps are readable. All three finish the purchase online — the difference is how much friction the online path carries.</p>
+      <div id="chart"></div>
+      <div class="legend" id="legend"></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="slabel">Side-by-side — every friction stage, all three operators (click a name for screenshots)</div>
+    <div class="mxwrap"><table class="matrix" id="matrix"></table></div>
+    <p class="mx-hint">Tap a provider's name at the top of its column to open its annotated screenshots — friction steps are framed in red.</p>
+    <div id="panels"></div>
+  </section>
+
+  <section>
+    <div class="slabel">What the score moves</div>
+    <div class="kpi-strip" id="kpis"></div>
+  </section>
+</div></div>
+
+<!-- ============ SEO ============ -->
+<div class="tabpane" id="tab-seo"><div class="wrap">
+  <section class="tabhead"><div class="eyebrow">SEO (Web) (Task 2)</div><h2 class="tabtitle">Yettel leads search — content depth is the moat</h2><p class="sub">Yettel 86 vs Telekom 82, One 74; the strongest tippek/guide layer, while Telekom leaks {{device.price}} template placeholders into indexed HTML.</p></section>
+  <section>
+    <div class="slabel">Search visibility &amp; on-page posture — all three operators</div>
+    <div class="note-box" id="seo-note"></div>
+    <div class="mxwrap"><table class="matrix" id="seo-matrix"></table></div>
+    <p class="mx-hint">Scores are an <strong>observational SEO read</strong> from search-visible evidence (Jun 2026), not Lighthouse. For exact performance numbers, run PageSpeed on each domain:</p>
+    <div class="legend" id="seo-psi" style="gap:10px"></div>
+  </section>
+  <section>
+    <div class="slabel">Concrete SEO findings per operator</div>
+    <div id="seo-findings"></div>
+  </section>
+</div></div>
+
+<!-- ============ GEO ============ -->
+<div class="tabpane" id="tab-geo"><div class="wrap">
+  <section class="tabhead"><div class="eyebrow">GEO (Web) (Task 2)</div><h2 class="tabtitle">A one-point second on AI visibility — winning the high-intent queries</h2><p class="sub">Telekom 76, Yettel 75, One 54; Yettel owns the 0-Ft / eSIM / online-buying questions, Telekom the generic brand ones.</p></section>
+  <section>
+    <div class="slabel">AI answer visibility (GEO) — how often each brand surfaces in AI recommendations</div>
+    <div class="note-box" id="geo-note"></div>
+    <div class="kpi-strip" id="geo-cards"></div>
+  </section>
+  <section>
+    <div class="slabel">Breakdown by question — who gets mentioned, who lands first</div>
+    <div class="mxwrap"><table class="matrix" id="geo-matrix"></table></div>
+    <p class="mx-hint" id="geo-legend"></p>
+  </section>
+</div></div>
+
+<!-- ============ APP (Yettel App Diagnostics) ============ -->
+<div class="tabpane" id="tab-app"><div class="wrap">
+  <section class="tabhead"><div class="eyebrow">Yettel App Diagnostics (Task 2)</div><h2 class="tabtitle">Best Android app of the three — but auth/login is the #1 complaint</h2><p class="sub">Yettel leads Android (4.1★) with the smallest cross-platform gap; measured reviews put auth/login at 29% of its negatives, plus a live Telenor→Yettel migration tail (15%).</p></section>
+  <section>
+    <div class="slabel">The app is Yettel’s digital-first channel</div>
+    <div class="note-box">Yettel’s growth bet runs through the app: <strong>Yepp — the digital-only plan — is app-exclusive</strong>, and eSIM activation, number port-in, saved-card billing, top-ups and self-service all live in-app. So app quality directly gates the 20%→50% digital &amp; assisted-sales target. Below: the cross-platform store read, what users actually complain about, what you can transact in each app, and the in-app Yepp-signup friction — with a runnable method to measure it.</div>
+  </section>
+
+  <section>
+    <div class="slabel">Store scorecard — iOS + Android, measured 2026-06-19</div>
+    <div class="mxwrap"><table class="matrix">
+      <tr><th class="mx-stage">Metric</th>
+        <th><div class="tcol-head" style="--c:#00a15f;cursor:default"><span class="tcol-name">Yettel HU</span></div></th>
+        <th><div class="tcol-head" style="--c:#e20074;cursor:default"><span class="tcol-name">Telekom</span></div></th>
+        <th><div class="tcol-head" style="--c:#6c3fc5;cursor:default"><span class="tcol-name">One</span></div></th></tr>
+      <tr><td class="mx-stage">iOS rating</td><td class="mx-cell"><span class="gb zero">4.4</span></td><td class="mx-cell"><span class="gb pos">4.5 ▲</span></td><td class="mx-cell"><span class="gb zero">4.4</span></td></tr>
+      <tr><td class="mx-stage">iOS ratings</td><td class="mx-cell"><span class="gb zero">65k</span></td><td class="mx-cell"><span class="gb pos">162k ▲</span></td><td class="mx-cell"><span class="gb weak">28k</span></td></tr>
+      <tr><td class="mx-stage">Android rating</td><td class="mx-cell"><span class="gb pos">4.1 ▲</span></td><td class="mx-cell"><span class="gb zero">3.9</span></td><td class="mx-cell"><span class="gb weak">3.7</span></td></tr>
+      <tr><td class="mx-stage">Android ratings</td><td class="mx-cell"><span class="gb zero">129k</span></td><td class="mx-cell"><span class="gb zero">129k</span></td><td class="mx-cell"><span class="gb zero">81k</span></td></tr>
+      <tr><td class="mx-stage">Android downloads</td><td class="mx-cell"><span class="gb zero">1M+</span></td><td class="mx-cell"><span class="gb pos">5M+ ▲</span></td><td class="mx-cell"><span class="gb zero">1M+</span></td></tr>
+      <tr><td class="mx-stage">iOS → Android gap</td><td class="mx-cell"><span class="gb pos">−0.3 ▲</span></td><td class="mx-cell"><span class="gb zero">−0.6</span></td><td class="mx-cell"><span class="gb weak">−0.7</span></td></tr>
+      <tr><td class="mx-stage">App size (iOS)</td><td class="mx-cell"><span class="gb weak">591 MB</span></td><td class="mx-cell"><span class="gb weak">573 MB</span></td><td class="mx-cell"><span class="gb pos">123 MB ▲</span></td></tr>
+    </table></div>
+    <p class="mx-hint">Read: Android is rated below iOS at all three — an industry pattern, not a Yettel failing. In fact <strong>Yettel has the best-rated Android app of the three (4.1) and the smallest cross-platform gap</strong>. The acute Android problem is specific to the <strong>Yepp cohort</strong> inside the app (9.2% churn, 5.8% crash — see Yepp Diagnostics), not the app at large. Star-distribution + update cadence come from the store APIs / AppFollow; all three ship frequent updates.</p>
+    <div class="legend" style="gap:10px">
+      <a class="psi-btn" target="_blank" rel="noopener" href="https://apps.apple.com/hu/app/yettel-hu/id926270115">▸ App Store · Yettel</a>
+      <a class="psi-btn" target="_blank" rel="noopener" href="https://play.google.com/store/apps/details?id=com.telenor.mytelenor">▸ Play · Yettel</a>
+      <a class="psi-btn" target="_blank" rel="noopener" href="https://play.google.com/store/apps/details?id=hu.telekom.telekomapp">▸ Play · Telekom</a>
+      <a class="psi-btn" target="_blank" rel="noopener" href="https://play.google.com/store/apps/details?id=hu.vodafone.apps.myvodafone">▸ Play · One</a>
+    </div>
+  </section>
+
+  <section>
+    <div class="slabel">Review-theme mining — 717 negative reviews, Claude-classified (MEASURED)</div>
+    <div class="mxwrap"><table class="matrix">
+      <tr><th class="mx-stage">Recurring theme · % of operator’s negative reviews</th>
+        <th><div class="tcol-head" style="--c:#00a15f;cursor:default"><span class="tcol-name">Yettel</span><span class="tcol-score" style="font-size:10px;opacity:.7">n=304</span></div></th>
+        <th><div class="tcol-head" style="--c:#e20074;cursor:default"><span class="tcol-name">Telekom</span><span class="tcol-score" style="font-size:10px;opacity:.7">n=199</span></div></th>
+        <th><div class="tcol-head" style="--c:#6c3fc5;cursor:default"><span class="tcol-name">One</span><span class="tcol-score" style="font-size:10px;opacity:.7">n=214</span></div></th></tr>
+      <tr><td class="mx-stage">Auth / login friction</td><td class="mx-cell"><span class="gb weak">89 · 29%</span></td><td class="mx-cell"><span class="gb zero">18 · 9%</span></td><td class="mx-cell"><span class="gb weak">85 · 40%</span></td></tr>
+      <tr><td class="mx-stage">Billing / payment</td><td class="mx-cell"><span class="gb zero">48 · 16%</span></td><td class="mx-cell"><span class="gb weak">77 · 39%</span></td><td class="mx-cell"><span class="gb zero">31 · 14%</span></td></tr>
+      <tr><td class="mx-stage">Crash / performance</td><td class="mx-cell"><span class="gb zero">49 · 16%</span></td><td class="mx-cell"><span class="gb weak">56 · 28%</span></td><td class="mx-cell"><span class="gb zero">39 · 18%</span></td></tr>
+      <tr><td class="mx-stage">Post-rebrand migration tail</td><td class="mx-cell"><span class="gb zero">46 · 15%</span></td><td class="mx-cell"><span class="gb pos">0 · 0%</span></td><td class="mx-cell"><span class="gb pos">14 · 7%</span></td></tr>
+      <tr><td class="mx-stage">App is a web shell (deep-links out)</td><td class="mx-cell"><span class="gb zero">24 · 8%</span></td><td class="mx-cell"><span class="gb pos">1 · 1%</span></td><td class="mx-cell"><span class="gb pos">5 · 2%</span></td></tr>
+      <tr><td class="mx-stage">English / localization gaps</td><td class="mx-cell"><span class="gb pos">3 · 1%</span></td><td class="mx-cell"><span class="gb pos">5 · 3%</span></td><td class="mx-cell"><span class="gb pos">1 · 1%</span></td></tr>
+    </table></div>
+    <p class="mx-hint"><strong>Measured:</strong> 717 negative Play reviews (rating ≤3, newest) classified by Claude into themes — each cell is count · share of that operator’s negative reviews. App Store fetch hit a library bug, so this is <strong>Play-only</strong>, with ±a few points of run-to-run classifier variance. — Reads the data forces: <strong>Yettel’s #1 complaint is auth / login (29%)</strong>, plus a real Telenor→Yettel <strong>migration tail (15%)</strong> — both larger than first estimated. <strong>One’s login pain is the market-worst (40%)</strong>, much of it migration-driven login loss bucketed as auth. <strong>Telekom is the opposite profile</strong> — billing (39%) and crashes (28%) dominate, login barely registers (9%). Yettel still holds the best aggregate Android rating (4.1, see scorecard); its negatives are concentrated and fixable.</p>
+  </section>
+
+
+  <section>
+    <div class="slabel">In-app commerce &amp; feature parity — what you can actually transact</div>
+    <div class="mxwrap"><table class="matrix">
+      <tr><th class="mx-stage">Capability in-app</th>
+        <th><div class="tcol-head" style="--c:#00a15f;cursor:default"><span class="tcol-name">Yettel</span></div></th>
+        <th><div class="tcol-head" style="--c:#e20074;cursor:default"><span class="tcol-name">Telekom</span></div></th>
+        <th><div class="tcol-head" style="--c:#6c3fc5;cursor:default"><span class="tcol-name">One</span></div></th></tr>
+      <tr><td class="mx-stage">Balance / usage self-service</td><td class="mx-cell"><span class="gb pos">✓</span></td><td class="mx-cell"><span class="gb pos">✓</span></td><td class="mx-cell"><span class="gb pos">✓</span></td></tr>
+      <tr><td class="mx-stage">Pay bill</td><td class="mx-cell"><span class="gb pos">✓</span></td><td class="mx-cell"><span class="gb pos">✓</span></td><td class="mx-cell"><span class="gb zero">~ flaky</span></td></tr>
+      <tr><td class="mx-stage">Top-up / buy data add-on</td><td class="mx-cell"><span class="gb pos">✓</span></td><td class="mx-cell"><span class="gb pos">✓</span></td><td class="mx-cell"><span class="gb pos">✓</span></td></tr>
+      <tr><td class="mx-stage">Change tariff</td><td class="mx-cell"><span class="gb zero">~</span></td><td class="mx-cell"><span class="gb pos">✓</span></td><td class="mx-cell"><span class="gb pos">✓</span></td></tr>
+      <tr><td class="mx-stage"><strong>New subscription signup (acquisition)</strong></td><td class="mx-cell"><span class="gb pos">✓ Yepp · app-only ★</span></td><td class="mx-cell"><span class="gb weak">– web</span></td><td class="mx-cell"><span class="gb weak">– web</span></td></tr>
+      <tr><td class="mx-stage">eSIM management</td><td class="mx-cell"><span class="gb pos">✓</span></td><td class="mx-cell"><span class="gb pos">✓</span></td><td class="mx-cell"><span class="gb zero">~</span></td></tr>
+      <tr><td class="mx-stage">Number port-in</td><td class="mx-cell"><span class="gb pos">✓ Yepp</span></td><td class="mx-cell"><span class="gb zero">~</span></td><td class="mx-cell"><span class="gb pos">✓ tracking</span></td></tr>
+      <tr><td class="mx-stage">Buy device + plan</td><td class="mx-cell"><span class="gb zero">~ web</span></td><td class="mx-cell"><span class="gb zero">~ web</span></td><td class="mx-cell"><span class="gb zero">~ web</span></td></tr>
+      <tr><td class="mx-stage">Support chat / AI assistant</td><td class="mx-cell"><span class="gb zero">~</span></td><td class="mx-cell"><span class="gb pos">✓ Magenta AI</span></td><td class="mx-cell"><span class="gb zero">~</span></td></tr>
+      <tr><td class="mx-stage">Parking / highway in-app</td><td class="mx-cell"><span class="gb pos">✓ built-in</span></td><td class="mx-cell"><span class="gb zero">~ separate app</span></td><td class="mx-cell"><span class="gb zero">~ separate app</span></td></tr>
+    </table></div>
+    <p class="mx-hint">All three are strong on self-service. The strategic gap: <strong>in-app new acquisition is rare — and Yettel uniquely owns it via Yepp</strong> (app-only signup: KYC + port-in + saved card + eSIM). Full device-plus-plan purchase is still web everywhere (that’s the Friction tab journey). To move digital-sales share past self-service, the lever is more in-app commerce — and Yepp is the template to extend.</p>
+  </section>
+
+  <section>
+    <div class="slabel">In-app friction — the Yepp signup, scored like the web tab</div>
+    <div class="mxwrap"><table class="matrix">
+      <tr><th class="mx-stage">Step (documented Yepp flow)</th><th><div class="tcol-head" style="--c:#00a15f;cursor:default"><span class="tcol-name">Friction</span><span class="tcol-score">~81<small>/100 · EST</small></span></div></th></tr>
+      <tr><td class="mx-stage">1 · Yepp entry — single plan, clear terms</td><td class="mx-cell"><span class="gb pos">−1</span> <span class="mx-note">app-native, one plan</span></td></tr>
+      <tr><td class="mx-stage">2 · KYC — ID + address card + selfie liveness</td><td class="mx-cell"><span class="gb weak">−8</span> <span class="mx-note">heaviest, front-loaded — but guided, in-app</span></td></tr>
+      <tr><td class="mx-stage">3 · Number port-in (keep number)</td><td class="mx-cell"><span class="gb zero">−3</span> <span class="mx-note">few fields, in-app</span></td></tr>
+      <tr><td class="mx-stage">4 · Save bank card + SCA / 3DS</td><td class="mx-cell"><span class="gb weak">−5</span> <span class="mx-note">recurring-billing setup — the step that later fails for 38% of churn</span></td></tr>
+      <tr><td class="mx-stage">5 · SIM choice — eSIM instant / physical wait</td><td class="mx-cell"><span class="gb zero">−2</span> <span class="mx-note">eSIM = instant provisioning (a real strength)</span></td></tr>
+      <tr><td class="mx-stage">6 · Activation — instant for eSIM</td><td class="mx-cell"><span class="gb pos">0</span> <span class="mx-note">fully digital, no store</span></td></tr>
+    </table></div>
+    <p class="mx-hint"><strong>EST ~81/100</strong> — an estimate from the documented flow, not a measured run. Lighter than it looks because it is fully in-app with instant eSIM; the friction is the front-loaded KYC (two documents + selfie) and the card-on-file step — the very setup whose later failure drives the 38% involuntary churn. The real risk is Android instability turning that friction into drop-off. Confirm the number with the Maestro walk below.</p>
+  </section>
+
+  <section>
+    <div class="slabel">The Playwright-equivalent for mobile — a runnable friction walk</div>
+    <p class="mx-hint" style="margin-bottom:10px">Playwright drives browsers; for a native app the direct analogues are <strong>Appium</strong> (full WebDriver-style automation, iOS + Android — the closest 1:1 to Playwright) and <strong>Maestro</strong> (lighter, YAML flows with built-in screenshots — the fastest path to a friction walk). Run the Yepp signup on an emulator or a real device, screenshot every step, and score it with the same rubric as the web Friction tab.</p>
+    <div class="codeblock"><span class="c"># Maestro flow — Yepp in-app signup friction walk (yepp-signup.yaml)</span>
+<span class="k">appId</span>: com.telenor.mytelenor
+---
+- launchApp
+- tapOn: "Yepp"
+- takeScreenshot: 01-entry
+- tapOn: "Get started"
+- takeScreenshot: 02-plan
+- tapOn: "Identify yourself"        <span class="c"># ID + address card + selfie (KYC)</span>
+- takeScreenshot: 03-kyc
+- tapOn: "Keep my number"            <span class="c"># number port-in</span>
+- takeScreenshot: 04-portin
+- tapOn: "Save card"                 <span class="c"># recurring billing setup</span>
+- takeScreenshot: 05-card
+- tapOn: "Choose eSIM"
+- assertVisible: "Active"
+- takeScreenshot: 06-active
+<span class="c"># run:  maestro test yepp-signup.yaml   → screenshots/ + step timings</span>
+<span class="c"># then score 0–100 with the web Friction rubric (steps, KYC weight, drop-off)</span></div>
+    <ul class="spec-list">
+      <li><b>Drives the real app</b><span>Appium / Maestro tap the actual shipped UI on an emulator or device — no API or source access needed.</span></li>
+      <li><b>Same scoring as web</b><span>Count steps, KYC weight, port-in success and time-to-active; flag drop-offs; score like the Friction tab — a mobile friction radar.</span></li>
+      <li><b>Reviews in parallel</b><span><code>google-play-scraper</code> / <code>app-store-scraper</code> (npm) pull recent reviews; cluster them with the Claude API into the themes above — the same pipeline shape as your web scrapers.</span></li>
+    </ul>
+  </section>
+
+  <section>
+    <div class="slabel">Yettel app — strengths &amp; watch-outs</div>
+    <div class="panel on" style="--c:#00a15f">
+      <div class="panel-head"><h3>Yettel HU <span class="pscore">4.4<small>★ iOS · 4.1★ Android</small></span></h3></div>
+      <ul class="spec-list" style="border:none">
+        <li><b style="min-width:0;color:var(--meas)">+</b><span>Best-rated Android app of the three (4.1) and the smallest iOS→Android gap; a clean digital-first wedge in <strong>Yepp (app-only signup)</strong> with instant eSIM; broad super-app (parking, highway, TV) = high engagement.</span></li>
+        <li><b style="min-width:0;color:var(--offline)">!</b><span>The measured #1 complaint is <strong>auth / login (29% of negative reviews)</strong>, with a live <strong>Telenor→Yettel migration tail (15%)</strong> — a concrete identity/login target, not a vague “app quality” gripe. At ~591 MB it is also the <strong>heaviest of the three</strong> (One does the core jobs at 123 MB), and the Android package is still <code>com.telenor.mytelenor</code> — legacy identity / ASO drag. The <strong>Yepp cohort’s Android stability</strong> remains the soft spot inside an otherwise peer-leading app.</span></li>
+      </ul>
+    </div>
+  </section>
+</div></div>
+
+<!-- ============ ACTIONS ============ -->
+<div class="tabpane" id="tab-actions"><div class="wrap">
+  <section class="tabhead"><div class="eyebrow">Actions</div><h2 class="tabtitle">From diagnosis to delivery — the plan, the payoff, the timeline</h2><p class="sub">Every diagnosed gap mapped to a concrete action — the <em>how</em> (tools, owners, org change), the metric it moves, the effort and the months to land it — split by task, each with a quantified aspiration.</p></section>
+
+  <section>
+    <div class="slabel">Task 1 — Scale Yepp · the actions</div>
+    <div class="panel on" style="--c:#00a15f">
+      <div class="panel-head"><h3>Plug the leak before buying growth</h3></div>
+      <ul class="spec-list" style="border:none">
+        <li><b style="min-width:26px;color:var(--c)">1</b><span><strong>Payment recovery (the involuntary-churn fix).</strong> Build an intelligent retry &amp; recovery layer on top of the payment stack. <em>How:</em> turn on the payment gateway's smart-retry + network tokenization (e.g. Adyen, Stripe, or the incumbent PSP's dunning module) to re-attempt failed charges on pay-cycle-optimal days; subscribe to a card account-updater (Visa Account Updater / Mastercard ABU) so expired cards refresh automatically; drive card-update prompts and failed-charge nudges through a lifecycle-messaging tool (e.g. Braze / CleverTap) over push + SMS + email; add an alternative-payment fallback (mobile balance, direct debit, Apple Pay / Google Pay tokens). <em>Who:</em> a small payments squad — one backend engineer, the PSP integration owner and a lifecycle marketer, sponsored jointly by Finance and Digital. <em>Org change:</em> make involuntary churn a named, jointly-owned KPI with a weekly dunning-performance review. <span class="mx-note" style="display:block;margin-top:6px">▸ the cheapest, biggest retention lever · low–med effort · first ship 4–6 wks, full ~2 mo</span></span></li>
+        <li><b style="min-width:26px;color:var(--c)">2</b><span><strong>Android stabilization.</strong> Make the Android build as stable as iOS. <em>How:</em> stand up crash + performance observability (Firebase Crashlytics + Play Console Android Vitals, plus an APM SDK such as Sentry or Embrace); run a crash-triage sprint on the top crash / ANR clusters and a cold-start + memory perf sprint; add a low-end-device test matrix (Firebase Test Lab / BrowserStack App Live) covering the cheap handsets common in the Yepp base; gate releases in CI on a crash-free-sessions threshold. <em>Who:</em> a dedicated Android squad (≈2 engineers + 1 QA) with an observability / SRE owner, plus a short external Android-performance consultant if in-house bandwidth is thin. <em>Org change:</em> crash-free rate becomes a hard release gate and an app on-call rotation is established. <span class="mx-note" style="display:block;margin-top:6px">▸ closes the platform churn + NPS gap · med–high effort · ~2–4 mo</span></span></li>
+        <li><b style="min-width:26px;color:var(--c)">3</b><span><strong>First-90-day onboarding.</strong> Replace the drop-on-the-home-screen first run with a guided path to first value. <em>How:</em> build a 3–4 step guided first-run with an in-app onboarding tool (e.g. Appcues, Pendo or UserGuiding, or native coachmarks) that lands the user on a real first success — a completed top-up or first data session — rather than the dashboard; wire behaviour-triggered lifecycle messaging (Braze / CleverTap / Firebase) for a day-1 “finish your first top-up”, an “auto top-up is on” reassurance and a day-3–7 “you've used X GB” value moment; add a save-the-cancel interceptor that catches port-out / cancel taps with a one-tap “fix my issue” or retention offer; instrument the whole first-90-day funnel in a product-analytics tool (Amplitude / Mixpanel / GA4) so every step's drop-off is visible and A/B-testable. <em>Who:</em> a growth / onboarding squad — a product manager, a mobile engineer, a UX designer and a lifecycle marketer, with analytics support. <em>Org change:</em> a “first-90-day activation” cohort metric on the exec dashboard and standing A/B-test discipline. <span class="mx-note" style="display:block;margin-top:6px">▸ the window that sets LTV — churn is front-loaded · med effort · ~2–3 mo</span></span></li>
+        <li><b style="min-width:26px;color:var(--c)">4</b><span><strong>Channel reallocation.</strong> Spend on the channels that retain, not the ones that merely acquire. <em>How:</em> stand up a member-get-member referral engine (a platform like Mention Me / Talkable / Friendbuy, or a custom build on the existing CRM) with unique codes, double-sided rewards and fraud controls; shift budget out of Campaign and Retail line items into Referral and Organic / ASO; model channel-level cost-per-6-month-retained in the BI stack (data warehouse + Looker / Power BI) and let retained value — not CPA — drive allocation, with source tracked through to 6-month retention. <em>Who:</em> a growth marketer + a BD owner for referral and a data analyst for the channel-economics model, with finance sign-off on budget moves. <em>Org change:</em> media budget governed monthly against cost-per-retained; referral becomes a named channel with its own owner. <span class="mx-note" style="display:block;margin-top:6px">▸ large efficiency gap left on the table · low effort · ~1 mo to reallocate, then ongoing</span></span></li>
+        <li><b style="min-width:26px;color:var(--c)">5</b><span><strong>In-app signup friction.</strong> Cut the front-loaded KYC + card friction that gates acquisition and seeds later payment failures. <em>How:</em> integrate document-scan + liveness eKYC (e.g. Onfido / Veriff / Sumsub / IDnow) to auto-fill identity fields from an ID photo instead of manual typing; defer non-essential fields to after activation; replace the redirect SCA with an in-app 3-D Secure 2 biometric step-up; default to instant eSIM provisioning via the carrier entitlement server so the line is live immediately; pre-fill the card step with tokenized Apple Pay / Google Pay. <em>Who:</em> a signup squad — a backend + mobile engineer, a KYC / compliance owner and a UX designer, with the PSP and eSIM-platform owners. <em>Org change:</em> signup-completion rate tracked as a funnel metric, with compliance sign-off on the eKYC vendor. <span class="mx-note" style="display:block;margin-top:6px">▸ lifts signup completion · pre-empts downstream payment failures · med effort · ~2–3 mo</span></span></li>
+      </ul>
+    </div>
+
+    <div class="slabel" style="margin-top:26px">Task 1 · execution roadmap (months)</div>
+    <div style="max-width:720px;margin:6px 0 0">
+      <svg viewBox="0 0 720 194" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto">
+      <line x1="180.0" y1="14" x2="180.0" y2="162" stroke="var(--line)" stroke-width="1"/>
+      <text x="180.0" y="178" text-anchor="middle" font-family="'IBM Plex Mono',monospace" font-size="10" fill="var(--ink-3)">0</text>
+      <line x1="267.0" y1="14" x2="267.0" y2="162" stroke="var(--line)" stroke-width="1"/>
+      <text x="267.0" y="178" text-anchor="middle" font-family="'IBM Plex Mono',monospace" font-size="10" fill="var(--ink-3)">1</text>
+      <line x1="354.0" y1="14" x2="354.0" y2="162" stroke="var(--line)" stroke-width="1"/>
+      <text x="354.0" y="178" text-anchor="middle" font-family="'IBM Plex Mono',monospace" font-size="10" fill="var(--ink-3)">2</text>
+      <line x1="441.0" y1="14" x2="441.0" y2="162" stroke="var(--line)" stroke-width="1"/>
+      <text x="441.0" y="178" text-anchor="middle" font-family="'IBM Plex Mono',monospace" font-size="10" fill="var(--ink-3)">3</text>
+      <line x1="528.0" y1="14" x2="528.0" y2="162" stroke="var(--line)" stroke-width="1"/>
+      <text x="528.0" y="178" text-anchor="middle" font-family="'IBM Plex Mono',monospace" font-size="10" fill="var(--ink-3)">4</text>
+      <line x1="615.0" y1="14" x2="615.0" y2="162" stroke="var(--line)" stroke-width="1"/>
+      <text x="615.0" y="178" text-anchor="middle" font-family="'IBM Plex Mono',monospace" font-size="10" fill="var(--ink-3)">5</text>
+      <line x1="702.0" y1="14" x2="702.0" y2="162" stroke="var(--line)" stroke-width="1"/>
+      <text x="702.0" y="178" text-anchor="middle" font-family="'IBM Plex Mono',monospace" font-size="10" fill="var(--ink-3)">6</text>
+      <text x="702" y="178" text-anchor="end" font-family="'IBM Plex Mono',monospace" font-size="9.5" fill="var(--ink-3)">months</text>
+      <text x="8" y="33" font-family="'IBM Plex Mono',monospace" font-size="11" fill="var(--ink-2)">Payment recovery</text>
+      <rect x="180.0" y="20" width="174.0" height="18" rx="3" fill="#00a15f"/>
+      <text x="267.0" y="33" text-anchor="middle" font-family="'IBM Plex Mono',monospace" font-size="9.5" fill="#fff">0–2</text>
+      <text x="360.0" y="33" font-family="'IBM Plex Mono',monospace" font-size="9" font-weight="700" fill="#00a15f">★ quick win</text>
+      <text x="8" y="61" font-family="'IBM Plex Mono',monospace" font-size="11" fill="var(--ink-2)">Channel reallocation</text>
+      <rect x="223.5" y="48" width="217.5" height="18" rx="3" fill="#2b86c5"/>
+      <text x="332.2" y="61" text-anchor="middle" font-family="'IBM Plex Mono',monospace" font-size="9.5" fill="#fff">0.5–3</text>
+      <text x="8" y="89" font-family="'IBM Plex Mono',monospace" font-size="11" fill="var(--ink-2)">In-app signup friction</text>
+      <rect x="267.0" y="76" width="261.0" height="18" rx="3" fill="#2b86c5"/>
+      <text x="397.5" y="89" text-anchor="middle" font-family="'IBM Plex Mono',monospace" font-size="9.5" fill="#fff">1–4</text>
+      <text x="8" y="117" font-family="'IBM Plex Mono',monospace" font-size="11" fill="var(--ink-2)">First-90-day onboarding</text>
+      <rect x="354.0" y="104" width="261.0" height="18" rx="3" fill="#2b86c5"/>
+      <text x="484.5" y="117" text-anchor="middle" font-family="'IBM Plex Mono',monospace" font-size="9.5" fill="#fff">2–5</text>
+      <text x="8" y="145" font-family="'IBM Plex Mono',monospace" font-size="11" fill="var(--ink-2)">Android stabilization</text>
+      <rect x="354.0" y="132" width="348.0" height="18" rx="3" fill="#e0541f"/>
+      <text x="528.0" y="145" text-anchor="middle" font-family="'IBM Plex Mono',monospace" font-size="9.5" fill="#fff">2–6</text>
+      </svg>
+    </div>
+
+    <div class="note-box" style="border-left-color:#00a15f;margin-top:18px"><strong>Aspiration — what &amp; how much:</strong> recover roughly half of the involuntary churn, lift “still active” from <strong>48% toward ~58–60%</strong>, and roughly <strong>double net adds (≈600 → ≈1,200 / mo)</strong> — without raising acquisition spend; blended CAC actually falls via the channel mix. <strong>How long:</strong> a <strong>~6-month</strong> programme, with the highest-ROI win (payment recovery) live in <strong>4–6 weeks</strong> and Android + onboarding landing by months 3–5. <span class="mx-note" style="display:block;margin-top:6px">Targets are projections from the diagnosed gaps and external benchmarks (e.g. Stripe/Deliveroo smart-retry recovery rates), not commitments.</span></div>
+  </section>
+
+  <section>
+    <div class="slabel">Task 2 — Digital transformation · the actions</div>
+    <div class="panel on" style="--c:#1f4fff">
+      <div class="panel-head"><h3>Convert the traffic you already win</h3></div>
+      <ul class="spec-list" style="border:none">
+        <li><b style="min-width:26px;color:var(--c)">1</b><span><strong>Friction reduction as the NPS engine.</strong> Run friction removal as a permanent programme, not a one-off project. <em>How:</em> instrument step-level drop-off across web checkout and the in-app auth / login / payment journeys with funnel analytics (Amplitude / GA4) plus session replay (Contentsquare / FullStory / Hotjar / MS Clarity) to see exactly where users stall; run a fortnightly friction-triage where the worst-dropping step gets a fix in the next sprint; measure movement with a transactional + relationship NPS instrument (Qualtrics / Medallia / Delighted) tied to each fix. <em>Who:</em> a cross-surface CRO / UX squad — a conversion-optimization lead, a UX researcher and web + app engineers, with an insights owner for NPS. <em>Org change:</em> a permanent “friction council” with one shared backlog spanning web + app, and NPS + step-completion as shared OKRs. <span class="mx-note" style="display:block;margin-top:6px">▸ the satisfaction lever and the conversion lever · med effort · standing, first wave ~2–3 mo</span></span></li>
+        <li><b style="min-width:26px;color:var(--c)">2</b><span><strong>Make the app a sales channel.</strong> Turn the app from self-service into a storefront. <em>How:</em> extend the Yepp app-only pattern (KYC + port-in + saved card + eSIM) to device-plus-plan purchase and tariff changes — web-only today; build native commerce screens for the device catalogue, instalment / financing selection and tariff change, reusing the eKYC + tokenized-payment + eSIM components from Task 1; integrate the order-management / inventory and financing backends (e.g. the existing Salesforce / Dynamics commerce APIs) into the app. <em>Who:</em> a commerce-in-app squad — a product manager, mobile + backend engineers, integration owners for OMS / inventory and financing, with merchandising input. <em>Org change:</em> a single owner for “app as a sales channel” carrying a digital-revenue target, aligned with retail on price parity. <span class="mx-note" style="display:block;margin-top:6px">▸ the core 20%→50% lever &amp; in-app revenue · high effort · ~6–18 mo</span></span></li>
+        <li><b style="min-width:26px;color:var(--c)">3</b><span><strong>Assisted-digital in retail &amp; care.</strong> Let human-assisted journeys finish on the digital rail. <em>How:</em> deploy a co-browse / screen-share tool in care (e.g. Glia, Surfly or Salesforce Service Cloud co-browse) so an agent can drive the same digital checkout the customer sees; equip stores with tablets running the same web / app checkout with agent assist; tag every assisted-but-digitally-completed order so it counts toward the digital-share target. <em>Who:</em> care + retail-ops owners, a contact-centre / CX platform owner, a store-enablement &amp; training lead, and an engineer for the order tagging. <em>Org change:</em> redefine “digital” to include assisted-digital completions, retrain agents and store staff, and re-point incentives so assisted-digital is rewarded over paper or a return visit. <span class="mx-note" style="display:block;margin-top:6px">▸ assisted-digital share, store throughput &amp; care NPS · med–high effort · ~9–24 mo</span></span></li>
+        <li><b style="min-width:26px;color:var(--c)">4</b><span><strong>Convert the top-of-funnel lead.</strong> Turn the visibility Yettel already wins into orders. <em>How:</em> fix the device-page template leak ({{device.price}} placeholders leaking into indexed HTML) by rendering price server-side / pre-rendering, validated with Google Search Console + a Screaming Frog crawl; build purchase-intent landing pages for the high-value queries (0-Ft, eSIM, online-only, port-in) optimized for both classic SEO and AI-answer (GEO) visibility, with Product / Offer + FAQ schema and answer-first copy; track ranking + AI-answer presence over time. <em>Who:</em> an SEO / content squad — a technical-SEO specialist, a frontend engineer for the SSR / template fix and a landing-page content producer, with analytics for organic-order tracking. <em>Org change:</em> SEO / GEO run as an owned, measured channel with a content calendar tied to purchase-intent queries. <span class="mx-note" style="display:block;margin-top:6px">▸ organic conversion &amp; SEO/GEO→sales · low–med effort · template fix ~3–4 wks, pages ongoing</span></span></li>
+        <li><b style="min-width:26px;color:var(--c)">5</b><span><strong>Outcome ownership &amp; measurement.</strong> Govern the 20%→50% number weekly instead of guessing at year-end. <em>How:</em> build a cost-per-transaction + digital-share dashboard with revenue attribution in the BI stack (data warehouse — BigQuery / Snowflake — + Looker / Power BI / Tableau), wiring web + app + assisted journeys into one funnel with multi-touch attribution; review it in a weekly governance ritual against the target trajectory. <em>Who:</em> a BI / analytics owner + a data engineer and a digital-transformation lead who personally owns the number, with finance for revenue reconciliation. <em>Org change:</em> one accountable owner for digital-share, a weekly cadence, and the dashboard as the single source of truth at the exec table. <span class="mx-note" style="display:block;margin-top:6px">▸ accountability &amp; prioritisation foundation · low–med effort · live in ~1–3 mo</span></span></li>
+      </ul>
+    </div>
+
+    <div class="slabel" style="margin-top:26px">Task 2 · execution roadmap (months)</div>
+    <div style="max-width:720px;margin:6px 0 0">
+      <svg viewBox="0 0 720 194" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto">
+      <line x1="205.0" y1="14" x2="205.0" y2="162" stroke="var(--line)" stroke-width="1"/>
+      <text x="205.0" y="178" text-anchor="middle" font-family="'IBM Plex Mono',monospace" font-size="10" fill="var(--ink-3)">0</text>
+      <line x1="329.2" y1="14" x2="329.2" y2="162" stroke="var(--line)" stroke-width="1"/>
+      <text x="329.2" y="178" text-anchor="middle" font-family="'IBM Plex Mono',monospace" font-size="10" fill="var(--ink-3)">6</text>
+      <line x1="453.5" y1="14" x2="453.5" y2="162" stroke="var(--line)" stroke-width="1"/>
+      <text x="453.5" y="178" text-anchor="middle" font-family="'IBM Plex Mono',monospace" font-size="10" fill="var(--ink-3)">12</text>
+      <line x1="577.8" y1="14" x2="577.8" y2="162" stroke="var(--line)" stroke-width="1"/>
+      <text x="577.8" y="178" text-anchor="middle" font-family="'IBM Plex Mono',monospace" font-size="10" fill="var(--ink-3)">18</text>
+      <line x1="702.0" y1="14" x2="702.0" y2="162" stroke="var(--line)" stroke-width="1"/>
+      <text x="702.0" y="178" text-anchor="middle" font-family="'IBM Plex Mono',monospace" font-size="10" fill="var(--ink-3)">24</text>
+      <text x="702" y="178" text-anchor="end" font-family="'IBM Plex Mono',monospace" font-size="9.5" fill="var(--ink-3)">months</text>
+      <text x="8" y="33" font-family="'IBM Plex Mono',monospace" font-size="11" fill="var(--ink-2)">Measurement &amp; ownership</text>
+      <rect x="205.0" y="20" width="62.1" height="18" rx="3" fill="#00a15f"/>
+      <text x="236.1" y="33" text-anchor="middle" font-family="'IBM Plex Mono',monospace" font-size="9.5" fill="#fff">0–3</text>
+      <text x="273.1" y="33" font-family="'IBM Plex Mono',monospace" font-size="9" font-weight="700" fill="#00a15f">★ foundation</text>
+      <text x="8" y="61" font-family="'IBM Plex Mono',monospace" font-size="11" fill="var(--ink-2)">Friction reduction (web+app)</text>
+      <rect x="225.7" y="48" width="165.7" height="18" rx="3" fill="#2b86c5"/>
+      <text x="308.5" y="61" text-anchor="middle" font-family="'IBM Plex Mono',monospace" font-size="9.5" fill="#fff">1–9</text>
+      <text x="397.4" y="61" font-family="'IBM Plex Mono',monospace" font-size="9" font-weight="700" fill="#2b86c5">continuous</text>
+      <text x="8" y="89" font-family="'IBM Plex Mono',monospace" font-size="11" fill="var(--ink-2)">Convert top-of-funnel (SEO/GEO)</text>
+      <rect x="246.4" y="76" width="82.8" height="18" rx="3" fill="#2b86c5"/>
+      <text x="287.8" y="89" text-anchor="middle" font-family="'IBM Plex Mono',monospace" font-size="9.5" fill="#fff">2–6</text>
+      <text x="8" y="117" font-family="'IBM Plex Mono',monospace" font-size="11" fill="var(--ink-2)">App as a sales channel</text>
+      <rect x="329.2" y="104" width="248.5" height="18" rx="3" fill="#3b5bdb"/>
+      <text x="453.5" y="117" text-anchor="middle" font-family="'IBM Plex Mono',monospace" font-size="9.5" fill="#fff">6–18</text>
+      <text x="583.8" y="117" font-family="'IBM Plex Mono',monospace" font-size="9" font-weight="700" fill="#3b5bdb">bulk of shift</text>
+      <text x="8" y="145" font-family="'IBM Plex Mono',monospace" font-size="11" fill="var(--ink-2)">Assisted-digital (retail &amp; care)</text>
+      <rect x="391.4" y="132" width="310.6" height="18" rx="3" fill="#3b5bdb"/>
+      <text x="546.7" y="145" text-anchor="middle" font-family="'IBM Plex Mono',monospace" font-size="9.5" fill="#fff">9–24</text>
+      </svg>
+    </div>
+
+    <div class="note-box" style="margin-top:18px"><strong>Aspiration — what &amp; how much:</strong> move digital &amp; assisted sales from <strong>20% to 50% by 2028</strong>, lift <strong>NPS</strong> by removing the measured friction (checkout, auth/login, payments), and cut <strong>cost-per-transaction</strong> as journeys shift from assisted-physical to digital &amp; assisted-digital. <strong>How long:</strong> a phased <strong>~24–30-month</strong> programme — measurement and the first friction wins live in the first quarter; app-as-a-sales-channel and assisted-digital are the 6–24-month build that carries the bulk of the 30-point shift. <span class="mx-note" style="display:block;margin-top:6px">The 50%-by-2028 figure is the brief’s target; the phasing is a planning estimate.</span></div>
+  </section>
+</div></div>
+
+<!-- ============ METHODOLOGY ============ -->
+<div class="tabpane" id="tab-methodology"><div class="wrap">
+  <section class="tabhead"><div class="eyebrow">Methodology</div><h2 class="tabtitle">What’s measured, what’s estimated — stated plainly</h2><p class="sub">The scoring formula and signal rubric, and the honest line between measured data (friction steps, iOS + Android store metrics, 717 classified Play reviews) and estimates (GEO probe, in-app friction).</p></section><section>
+
+  <h2 class="mh">1 · The task</h2>
+  <p class="mlead">Comparability comes from holding the task identical across all three operators. Any deviation is recorded in notes.</p>
+  <ul class="spec-list" id="m-task"></ul>
+
+  <h2 class="mh">2 · The score</h2>
+  <p class="mlead">Each operator starts at 100. Every step subtracts the friction observed at that step; bonuses add back. Lower final = more friction. The number is a relative friction index for one task — not an absolute quality rating, and not comparable across different tasks.</p>
+  <div class="formula">final = 100 + Σ stepΔ &nbsp;|&nbsp; stepΔ = Σ(signal penalties) + Σ(bonuses) at that step</div>
+
+  <h2 class="mh">3 · Signal rubric</h2>
+  <p class="mlead">Every step delta is built from these observed signals — so each number traces to something seen, not a feeling. Weights reflect impact on the digital→assisted boundary: the two heaviest are telco-specific.</p>
+  <div class="tablecard"><table class="mtab" id="m-rubric"><tr><th>Friction signal</th><th>How to observe it</th><th class="mw">Points</th></tr></table></div>
+
+  <h2 class="mh">4 · How these three were measured</h2>
+  <p class="mlead">Not a template — this is the actual run behind the numbers.</p>
+  <ul class="spec-list">
+    <li><b>Method</b><span>Each operator's handset→checkout journey walked once with a Playwright (Chromium) script and confirmed manually, in a fresh incognito session with cookies cleared.</span></li>
+    <li><b>Reference config</b><span>iPhone 16 128 GB · 24-month postpaid (voice + data) · number port-in · new consumer · Hungary. Held constant across all three.</span></li>
+    <li><b>Capture</b><span>A screenshot saved at each of the 8 journey stages (<code>shots/&lt;key&gt;-0&lt;step&gt;.png</code>); each step delta scored from the §3 signals against that screenshot.</span></li>
+    <li><b>Stop point</b><span>Stopped at the checkout gate — no real identity/credit submission and no signature was completed.</span></li>
+    <li><b>Shared norm</b><span>Identity confirmed by document at courier handover is common to all three, so it is treated as an industry norm and not scored as a differentiator.</span></li>
+    <li><b>Dates</b><span>Yettel & Magyar Telekom walked 2026-06-18; One walked 2026-06-19.</span></li>
+  </ul>
+
+  <h2 class="mh">5 · SEO read — how</h2>
+  <p class="mlead">An observational, single-pass read (2026-06-19), not a Lighthouse run. From search-visible evidence — what each domain ranks for, content depth, indexed-page behaviour — five dimensions are rated 0–100 and averaged. Precise performance / Core Web Vitals are deferred to PageSpeed Insights (linked per domain on the SEO tab), because the live crawl can't be reproduced here.</p>
+  <ul class="spec-list">
+    <li><b>Dimensions</b><span>Branded SERP ownership · category-keyword reach · content depth / topical authority · technical hygiene (observed) · brand-equity continuity.</span></li>
+    <li><b>Sources</b><span>Live search across branded, category and product queries (HU + EN); operator domains; NMHH and tech-press references.</span></li>
+    <li><b>Not measured here</b><span>Lighthouse scores, Core Web Vitals, exact indexed-page counts, backlink/DA metrics — use PageSpeed / Search Console / a backlink tool for those.</span></li>
+  </ul>
+
+  <h2 class="mh">6 · GEO probe — how</h2>
+  <p class="mlead">GEO = generative-engine optimization: how likely a brand is to be surfaced and cited in AI-assistant answers. The probe is anchored to the <strong>same purchase as the Friction tab</strong> — iPhone 16 128 GB on a 24-month plan — not generic “best operator” questions, so it reads the visibility that actually drives this sale. Single-model, single-pass (Claude grounded with web search, 2026-06-19); a directional read, not a measured multi-model share.</p>
+  <div class="formula">operator GEO = average of the 10 per-question answer-presence scores (0–100)</div>
+  <ul class="spec-list">
+    <li><b>Questions</b><span>10 purchase-intent prompts (HU + EN), all for iPhone 16 128 GB + plan: which operator, 0 Ft up-front, cheapest instalment, 24-month comparison, unlimited-data tariff, eSIM, English buy, number port-in, order-online, best value.</span></li>
+    <li><b>Cell score 0–100</b><span>Per question, each operator’s answer-presence is estimated from two observable proxies: does it have a dedicated, crawlable, citable page for that intent, and does its positioning match the query. Higher = more likely an assistant surfaces and quotes it.</span></li>
+    <li><b>Brand dilution</b><span>One is marked down where it is still cited as “Vodafone” after the 2025 rebrand (most visible on the English query); Yettel carries a small residual “Telenor” drag.</span></li>
+    <li><b>Leads</b><span>Per question, the operator with the highest answer-presence is the “lead” for that query. Across the 10 questions the leads split <strong>5–5 between Yettel and Telekom</strong>; One takes none — the split shown on the Executive Summary GEO chart.</span></li>
+    <li><b>Caveat</b><span>Single model + single pass, scored from live search evidence — not a measured multi-model run. A production score would average several models over many runs (as the standalone live tool does).</span></li>
+  </ul>
+
+  <h2 class="mh">7 · App read — how</h2>
+  <p class="mlead">The App tab reads the store layer directly on <strong>both platforms</strong> — Apple App Store (iOS) and Google Play (Android), Hungarian listings: rating, rating count, download size / install band and package id, captured 2026-06-19, each linked to verify.</p>
+  <ul class="spec-list">
+    <li><b>Review-theme mining (run)</b><span>Not just described — it was executed: <strong>717 negative reviews (rating ≤ 3)</strong> were pulled from Google Play across the three apps and classified into themes by an LLM (Claude). This is the source of the measured complaint mix on the App and Executive tabs (e.g. Yettel <strong>auth / login 29%</strong>, Telekom billing 39%, One auth 40%).</span></li>
+    <li><b>Play-only · variance</b><span>The App Store review fetch failed at run time, so the theme percentages are <strong>Google-Play-only</strong> and carry ±classifier variance — stated as such wherever they appear.</span></li>
+    <li><b>Not run here</b><span>The remaining layers — in-app funnel analytics and a task-based in-app UX walk — are laid out as method only. They need in-app event data (App Store Connect / Play Console / Firebase) and a device harness (Maestro / Appium).</span></li>
+  </ul>
+
+  <h2 class="mh">8 · Yepp diagnostics — source</h2>
+  <p class="mlead">The Yepp tab summarises the supplied Yepp performance workbook (monthly overview, sales funnel, customer-status, tenure cohorts, churn breakdown, usage/engagement, acquisition channels, campaign history). Figures are taken directly from that data and condensed to the headline findings; cost-per-retained is derived as CPA ÷ 6-month retention. The latest partial week is treated as billing-report lag, not a real collapse.</p>
+
+  <h2 class="mh">9 · Diagnosis vs recommendation — kept separate</h2>
+  <p class="mlead">Every diagnostic tab — Yepp, App, Friction, SEO, GEO — states <strong>findings only</strong>. All prioritisation, actions and roadmaps are consolidated in the <strong>Executive Summary</strong> and the <strong>Actions</strong> tab, so the deck has a single source of truth and no competing or contradictory to-do lists. Charts use one consistent palette throughout: <strong>Yettel = green</strong> (the same green also flags a measured signal), Telekom = magenta, One = purple; amber / orange is reserved for friction and for estimated (vs measured) values.</p>
+
+</section></div></div>
+
+<div id="lightbox" onclick="closeZoom()">
+  <img id="lb-img" src="" alt="friction screenshot" />
+  <div id="lb-miss"></div><div id="lb-cap"></div>
+</div>
+
+<footer><div class="wrap">telco digital-readiness radar · Hungary · Yepp + app + web (friction · SEO · GEO) · v1.3</div></footer>
+
+<script>
+/* ===========================================================================
+   DATA MODEL — three Hungarian operators, identical task, all measured.
+   img convention: shots/<key>-0<step>.png
+   =========================================================================== */
+const SHOTS_HINT="Save the screenshot at this path in the /shots folder:";
+
+/* the 8 journey stages = the 8 friction types (matrix col 1 + chart x-axis) */
+const STEPS=["Shop entry","Choose handset","Choose plan","Financing & terms",
+  "Details & cart","Identity / account gate","Checkout & pay","Contract close"];
+
+const RUBRIC=[
+  ["Forces a step offline","Flow cannot finish online: mandatory store / courier / call / in-person signature","−20 hard · −12 conditional"],
+  ["Identity / credit check weight","In-app video-ident = −4 · document upload + manual wait = −8","−4 to −8"],
+  ["Account required before full price","Final price/financing not visible as a guest","−6"],
+  ["Hidden / late price or fee change","Price or fees rise after entry (activation / financing fee appears late)","−5 each"],
+  ["Opaque financing terms","Total cost / APR / instalment unclear until late in the flow","−5"],
+  ["Dark pattern","Pre-ticked add-on, forced interstitial upsell, hard-to-decline option","−4 each"],
+  ["No auto-pay / saved-card option","No recurring-payment method surfaced for the monthly bill","−4"],
+  ["Excess clicks","Count clicks start→signing; baseline 12","−0.5 / click over (cap −6)"],
+  ["Excess form fields","Count fields entered; baseline 15","−0.3 / field over (cap −6)"],
+  ["Pop-up / cookie interruptions","Modal interruptions during the flow","−1 each (cap −4)"],
+  ["Slow step","Page/step load > 3 s","−1 each (cap −4)"]
+];
+const BONUSES=[
+  ["Fully online e-signed contract","Contract closes online (T&C acceptance / e-signature), no courier/store","+3"],
+  ["eSIM / instant provisioning","eSIM or instant activation offered","+3"],
+  ["Auto-pay set as default","Recurring card / direct debit pre-selected","+2"],
+  ["Guest / express path","Can complete without creating a full account","+2"]
+];
+
+const KPIS=[
+  ["Digital & assisted share","Every friction point is a place the customer drops the online path and calls or walks in. A lighter journey keeps more of the purchase self-serve — the direct lever on the 20%→50% target."],
+  ["Cost per transaction","Abandoned online journeys resurface in the store or call centre, the expensive channels. Cutting mid-flow weight (OTP stacks, full KYC, upsell detours) deflects volume to self-serve."],
+  ["NPS","Friction is felt, not named. The steep drops are exactly where the experience sours; flattening the curve is the most direct NPS lever inside the funnel."]
+];
+
+const TASK=[
+  ["Customer profile","New consumer, not logged into an existing account."],
+  ["Product","iPhone 16 128 GB on a 24-month postpaid voice + data plan (financed contract). Not prepaid, not SIM-only."],
+  ["Plan","The operator's mainstream postpaid tier (unlimited voice + data). Tier held constant in intent."],
+  ["Number","Mobile number port-in (MNP)."],
+  ["Environment","Fresh incognito session, cookies cleared; desktop web. Same week, date recorded."],
+  ["Endpoint","Stop at the checkout gate. Do NOT submit a real credit application or signature."]
+];
+
+const PROVIDERS=[
+  { key:"yettel", name:"Yettel", short:"Yettel", color:"#00a15f",
+    measured:true, date:"2026-06-18", tag:"Lightest path — friction is length + noise",
+    verdict:"The purchase completes fully online: a genuine guest checkout — the only true guest path of the three — a 10-step form, and the contract created by accepting the online T&C, with courier delivery. No store or signature step. The score is held back almost entirely by upfront dark-pattern / upsell noise — an email-signup popup, a “59 viewed today” urgency counter, a spin-to-win interstitial, and an insurance/coupon upsell — not by the mechanics of the purchase. A deposit can apply, but it's an industry norm and shown transparently.",
+    steps:[{d:-2,note:"Cookie wall + email-signup popup on entry"},{d:-4,note:"Clean product page, but a “59 viewed today” urgency nudge"},{d:-1,note:"Plan preselected (Prime Max, 24 months)"},
+      {d:-5,note:"Spin-to-win newsletter interstitial + insurance / coupon upsell"},{d:-2,note:"Cart: full price transparent; accessory cross-sell"},{d:2,note:"Genuine guest checkout — the only true guest path of the three"},
+      {d:-4,note:"10-step online checkout form — the longest of the three (guest, no OTP/KYC, but heavy)"},{d:0,note:"Online contract + document ID at courier handover — shared industry norm, not scored"}] },
+  { key:"telekomhu", name:"Magyar Telekom", short:"Telekom", color:"#e20074",
+    measured:true, date:"2026-06-18", tag:"Fully online but heavy — double OTP + full KYC",
+    verdict:"The order can be placed online, but it's much heavier than the others: after “Next step” a customer-type modal (not a true guest path — it builds an account), a gamified “Discount bar” upsell in the cart, then phone-OTP AND email-code mid-checkout, and finally full online KYC (ID number + address-card number). Document identity at handover is an industry norm (all three do it), so it isn't a differentiator — Telekom is pulled down by high online friction, not by an offline detour.",
+    steps:[{d:-2,note:"Cookie wall on entry"},{d:-1,note:"Clean product page, “Log in” steering"},{d:-1,note:"Plan preselected (Mobil L + Net L, 2 yr)"},
+      {d:-1,note:"Interest-free instalment preselected; deposit flagged"},{d:-5,note:"“Next step” → customer-type modal + gamified “Discount bar” upsell"},{d:-3,note:"New-customer path — builds an account, not a true guest"},
+      {d:-8,note:"Mid-checkout phone-OTP + email-code + full online KYC (ID & address-card number)"},{d:0,note:"Online contract + document ID at courier handover — shared industry norm, not scored"}] },
+  { key:"one", name:"One", short:"One", color:"#6c3fc5",
+    measured:true, date:"2026-06-19", tag:"Strong digital, but no guest path",
+    verdict:"The order and the contract complete online; identity is confirmed by document at courier handover — the same industry norm as the others (in-person only if the online ID/credit check fails). Pricing is transparent upfront (0 Ft entry fee, free delivery), and eSIM + number port-in are supported. The friction is structural: no true guest path (an email + phone account is required), an extra “Personalize” step, a 30-month instalment by default, and a long checkout accordion carrying the credit-check fields.",
+    steps:[{d:-2,note:"Cookie / consent on entry"},{d:-1,note:"Clean product page, price + monthly fee visible upfront"},{d:-1,note:"Tariff S preselected (entry tier)"},
+      {d:-2,note:"30-month device instalment by default (longer than the 24-month reference)"},{d:-1,note:"Extra “Personalize” step, but it surfaces eSIM + port-in (a real convenience); minor insurance upsell"},{d:-3,note:"Account required (email + phone) — no true guest path"},
+      {d:-5,note:"Long checkout accordion + credit-check fields"},{d:0,note:"Online contract + document ID at courier handover — shared industry norm, not scored"}] }
+];
+
+/* column order requested: Yettel, Telekom, One */
+const MX_ORDER=["yettel","telekomhu","one"];
+
+/* ---- derive ---- */
+PROVIDERS.forEach(p=>p.steps.forEach((s,i)=>{ if(!s.img) s.img=`shots/${p.key}-0${i+1}.png`; }));
+PROVIDERS.forEach(p=>{p.scores=[100];p.steps.forEach(s=>p.scores.push(p.scores[p.scores.length-1]+s.d));
+  p.final=p.scores[p.scores.length-1];});
+const ranking=[...PROVIDERS].sort((a,b)=>b.final-a.final);
+const COLS=MX_ORDER.map(k=>PROVIDERS.find(p=>p.key===k));
+
+/* ---- chart: y zoomed to 60-100, x-axis labelled with the friction stage ---- */
+(function(){
+  const W=960,H=470,padL=42,padR=78,padT=22,padB=86,n=STEPS.length,YMIN=60,YMAX=100;
+  const x=i=>padL+(W-padL-padR)*(i/n);
+  const y=v=>{const c=Math.max(YMIN,Math.min(YMAX,v));return padT+(H-padT-padB)*(1-(c-YMIN)/(YMAX-YMIN));};
+  let s=`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Friction loss by operator across the handset journey">`;
+  [60,70,80,90,100].forEach(v=>{s+=`<line x1="${padL}" y1="${y(v)}" x2="${W-padR}" y2="${y(v)}" stroke="var(--grid)" stroke-width="1"/>`;
+    s+=`<text x="${padL-10}" y="${y(v)+4}" text-anchor="end" font-family="IBM Plex Mono" font-size="11" fill="var(--ink-3)">${v}</text>`;});
+  /* x-axis stage (friction type) labels, angled */
+  const lblY=H-padB+16;
+  s+=`<text x="${x(0)}" y="${lblY}" transform="rotate(-22 ${x(0)} ${lblY})" text-anchor="end" font-family="IBM Plex Mono" font-size="9.5" fill="var(--ink-3)">Start (100)</text>`;
+  STEPS.forEach((st,i)=>{const xx=x(i+1);
+    s+=`<text x="${xx}" y="${lblY}" transform="rotate(-22 ${xx} ${lblY})" text-anchor="end" font-family="IBM Plex Mono" font-size="9.5" fill="var(--ink-3)">${i+1}. ${st}</text>`;});
+  /* lines + points */
+  PROVIDERS.forEach(p=>{const pts=p.scores.map((v,i)=>`${x(i)},${y(v)}`).join(" ");
+    s+=`<polyline points="${pts}" fill="none" stroke="${p.color}" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round"/>`;
+    p.scores.forEach((v,i)=>{s+=`<circle cx="${x(i)}" cy="${y(v)}" r="3" fill="${p.color}"/>`;});});
+  /* right-side score labels, de-cluttered */
+  const used=[];
+  ranking.forEach(p=>{let ly=y(p.final)+4;while(used.some(o=>Math.abs(o-ly)<13))ly+=13;used.push(ly);
+    s+=`<text x="${x(n)+8}" y="${ly}" font-family="IBM Plex Mono" font-size="11.5" font-weight="600" fill="${p.color}">${p.short} ${p.final}</text>`;});
+  s+=`</svg>`;document.getElementById('chart').innerHTML=s;
+  document.getElementById('legend').innerHTML=PROVIDERS.map(p=>`<span><i style="background:${p.color}"></i>${p.name} <span style="color:var(--ink-3)">· ${p.final}/100</span></span>`).join("");
+})();
+
+/* ---- always-on matrix ---- */
+(function(){
+  let head=`<tr><th class="mx-stage">Friction stage</th>`+COLS.map(p=>
+    `<th><button class="tcol-head" style="--c:${p.color}" onclick="openDetail('${p.key}')" aria-label="${p.name} screenshots">
+       <span class="tcol-name">${p.name}</span>
+       <span class="tcol-score">${p.final}<small>/100</small></span>
+       <span class="tcol-tag">${p.tag}</span>
+       <span class="tcol-hint">view shots \u25BE</span></button></th>`).join("")+`</tr>`;
+  let body=STEPS.map((st,i)=>{
+    return `<tr><td class="mx-stage"><span class="mx-num">${i+1}</span>${st}</td>`+
+      COLS.map(p=>{const s=p.steps[i];const cls=s.d<0?'neg':s.d>0?'pos':'zero';
+        return `<td class="mx-cell"><span class="mx-d ${cls}">${s.d>0?'+':''}${s.d}</span><span class="mx-note">${s.note}</span></td>`;}).join("")+
+      `</tr>`;}).join("");
+  document.getElementById('matrix').innerHTML=head+body;
+})();
+
+/* ---- detail panels: verdict + annotated screenshot thumbnails (red frame on friction steps) ---- */
+document.getElementById('panels').innerHTML=COLS.map(p=>{
+  const grid=p.steps.map((s,i)=>{const cls=s.d<0?'bad':s.d>0?'good':'neu';
+    return `<figure class="shot-card">
+        <button class="shot-thumb ${cls}" onclick="zoom('${s.img}','${p.name} · ${i+1}. ${STEPS[i]}')" aria-label="${p.name} step ${i+1} screenshot">
+          <img src="${s.img}" alt="${p.name} ${STEPS[i]}" onerror="this.closest('.shot-thumb').classList.add('noimg')"/>
+          <span class="shot-flag">friction</span>
+          <span class="shot-d ${cls}">${s.d>0?'+':''}${s.d}</span>
+        </button>
+        <figcaption><b>${i+1}. ${STEPS[i]}</b><br>${s.note}</figcaption>
+      </figure>`;}).join("");
+  return `<div class="panel" id="panel-${p.key}" style="--c:${p.color}">
+      <div class="panel-head">
+        <h3>${p.name} <span class="pscore">${p.final}<small> friction index /100</small></span></h3>
+        <p class="verdict">${p.verdict}</p>
+      </div>
+      <div class="shotgrid">${grid}</div>
+    </div>`;}).join("");
+
+/* ---- KPIs ---- */
+document.getElementById('kpis').innerHTML=KPIS.map(k=>`<div class="kpi"><h4>${k[0]}</h4><p>${k[1]}</p></div>`).join("");
+
+/* ---- methodology ---- */
+document.getElementById('m-task').innerHTML=TASK.map(t=>`<li><b>${t[0]}</b><span>${t[1]}</span></li>`).join("");
+document.getElementById('m-rubric').innerHTML+=RUBRIC.map(r=>`<tr><td class="step-name">${r[0]}</td><td class="step-note">${r[1]}</td><td class="mw neg">${r[2]}</td></tr>`).join("")
+  +`<tr><td colspan="3" style="background:var(--meas-soft);font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.08em;color:var(--meas);font-weight:600">BONUSES (add back)</td></tr>`
+  +BONUSES.map(b=>`<tr><td class="step-name">${b[0]}</td><td class="step-note">${b[1]}</td><td class="mw pos">${b[2]}</td></tr>`).join("");
+
+/* ---- interaction ---- */
+let curDetail=null;
+function openDetail(key){
+  const panel=document.getElementById('panel-'+key);
+  if(curDetail===key){panel.classList.remove('on');curDetail=null;return;}
+  COLS.forEach(p=>document.getElementById('panel-'+p.key).classList.remove('on'));
+  panel.classList.add('on');curDetail=key;
+  panel.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+function tab(name){
+  ['exec','yepp','app','friction','seo','geo','actions','methodology'].forEach(t=>{
+    document.getElementById('tab-'+t).classList.toggle('on',t===name);
+    document.getElementById('tb-'+t).classList.toggle('active',t===name);
+  });
+  window.scrollTo({top:0,behavior:'auto'});}
+const lb=document.getElementById('lightbox'),lbImg=document.getElementById('lb-img'),
+  lbCap=document.getElementById('lb-cap'),lbMiss=document.getElementById('lb-miss');
+function zoom(src,cap){lbCap.textContent=cap;lbMiss.style.display='none';lbImg.style.display='block';
+  lbImg.onerror=()=>{lbImg.style.display='none';lbMiss.style.display='block';
+    lbMiss.innerHTML=`No screenshot yet.<br>${SHOTS_HINT}<br><strong>${src}</strong>`;};
+  lbImg.src=src;lb.classList.add('on');}
+function closeZoom(){lb.classList.remove('on');}
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeZoom();});
+
+/* open Yettel's screenshots by default to showcase the annotated view */
+
+/* ===========================================================================
+   SEO + GEO data (baked; see Methodology §5–6 for how it was produced)
+   =========================================================================== */
+const SEO={ asOf:"2026-06-19",
+  dims:["Branded SERP","Category reach","Content depth","Technical hygiene","Brand continuity"],
+  ops:[
+    {key:"yettel",name:"Yettel",color:"#00a15f",score:86,r:[95,88,90,80,85],
+     find:["Strongest content-SEO of the three: a real guide/blog layer (“tippek”) targeting category terms (korlátlan mobilnet, tarifa-választó), not only product pages.",
+       "Clean URLs + a dedicated English subdomain (en.yettel.hu) for press/awards — directly citable by international sources.",
+       "Watch: heavy promo interstitials (spin-to-win) can trip intrusive-interstitial / Core-Web-Vitals signals — verify in PageSpeed."]},
+    {key:"telekomhu",name:"Magyar Telekom",color:"#e20074",score:82,r:[96,90,82,68,90],
+     find:["Deepest authority + widest coverage (lakossági/üzleti split, webshop, extensive FAQ — strong for long-tail).",
+       "Technical flag: device pages leak client-side template placeholders ({{device.price…}}) into indexed HTML — JS-rendered content isn’t reliably pre-rendered. A real crawl/SEO risk; verify SSR / pre-render.",
+       "Stable brand = consolidated link equity; main risk is page weight / JS on device pages (check CWV)."]},
+    {key:"one",name:"One",color:"#6c3fc5",score:74,r:[88,82,70,75,55],
+     find:["Solid structured product/tariff pages (incl. PDF datasheets) — branded + category terms are covered.",
+       "Thinner editorial/guide layer than Yettel → less topical authority for non-product queries.",
+       "Biggest issue: the 2025 Vodafone→One rebrand. Legacy authority + backlinks point to the old brand; redirects and brand-equity migration must be airtight or category rankings leak."]}
+  ]};
+
+const GEO={ asOf:"2026-06-19", model:"Claude + web_search (single-model, grounded)",
+  intent:"iPhone 16 128 GB on a 24-month postpaid plan — the same buy as the Friction tab.",
+  questions:[
+    "iPhone 16 128 GB with a plan — which operator? (iPhone 16 128 GB előfizetéssel – melyik szolgáltató?)",
+    "iPhone 16 128 GB at 0 Ft up-front — where? (iPhone 16 128 GB 0 Ft kezdőrészlettel – hol?)",
+    "Cheapest iPhone 16 128 GB on instalment + tariff (Legolcsóbb iPhone 16 128 GB részletre + tarifával)",
+    "iPhone 16 128 GB on a 24-month plan — comparison (iPhone 16 128 GB 24 hónapos előfizetéssel – összehasonlítás)",
+    "iPhone 16 128 GB with an unlimited-data tariff (iPhone 16 128 GB korlátlan adatos tarifával)",
+    "iPhone 16 128 GB with eSIM + subscription (iPhone 16 128 GB eSIM-mel + előfizetés)",
+    "Where to buy iPhone 16 128 GB with a plan in Hungary? (asked in English)",
+    "iPhone 16 128 GB with number port-in subscription (iPhone 16 128 GB számhordozással, előfizetéssel)",
+    "iPhone 16 128 GB plan — order online (iPhone 16 128 GB előfizetés – online rendelés)",
+    "Best-value operator for iPhone 16 128 GB (Melyik operátornál éri meg legjobban az iPhone 16 128 GB?)"
+  ],
+  /* per-question ANSWER-PRESENCE 0–100 for [Yettel, Magyar Telekom, One] */
+  grid:[
+    [70,85,52],[85,75,46],[80,64,60],[68,80,54],[72,80,56],
+    [78,72,60],[68,84,40],[72,78,56],[78,76,58],[80,68,54]
+  ],
+  vodQ:[6],
+  ops:[
+    {key:"yettel",name:"Yettel",color:"#00a15f",
+     note:"A whisker behind Telekom. Yettel actually wins the specific high-intent queries — 0 Ft up-front, cheapest, eSIM, order-online, best value — thanks to dedicated, crawlable landing pages. But Telekom’s brand salience edges the aggregate; Yettel is a schema/page fix away from flipping it to #1.",
+     act:["Keep the dedicated iPhone / 0-Ft pages crawlable, and add FAQ + Product/Offer schema so assistants quote the price and terms directly.","Pair the speed/value proof (Ookla, Opensignal) with the handset pages — that’s the edge on ‘best-value iPhone 16’.","Retire the residual ‘Telenor’ tag in page titles and press."]},
+    {key:"telekomhu",name:"Magyar Telekom",color:"#e20074",
+     note:"Narrowly first, on brand salience: the default ‘biggest / best overall’ operator, so assistants surface it for the generic and English purchase queries. But on the deal pages the price renders client-side ({{device.price…}} leaks into the HTML), so the concrete iPhone-16 price isn’t citable — high presence, weak citable detail.",
+     act:["Fix device-page rendering so price + instalment terms sit in crawlable HTML — today they’re invisible to assistants.","Add Product/Offer schema to the iPhone pages.","Keep defending the ‘best overall / coverage’ framing it already owns."]},
+    {key:"one",name:"One",color:"#6c3fc5",
+     note:"Clean product pages with explicit prices (good for the exact ‘iPhone 16 128 GB’ query) but few deal / landing pages, and the 2025 Vodafone→One rebrand still dilutes the brand — assistants under-recognise ‘One’, especially in English.",
+     act:["Brand-name repair first: bind ‘One (formerly Vodafone Hungary)’ everywhere citable so assistants connect the two names.","Build dedicated ‘iPhone 16 with plan / 0 Ft’ landing pages — today it mostly has the bare product page.","Add Product/Offer + FAQ schema to surface the clear pricing it already has."]}
+  ]};
+
+/* ---- SEO render ---- */
+(function(){
+  document.getElementById('seo-note').innerHTML="Observational read (Jun 2026) from search-visible evidence across branded, category and product queries — <strong>not Lighthouse</strong>. Five dimensions rated 0–100 and averaged. Run PageSpeed for the performance numbers this view can’t fetch.";
+  const sc=v=>`<span class="gb ${v>=85?'pos':v>=70?'zero':'weak'}">${v}</span>`;
+  let head=`<tr><th class="mx-stage">SEO dimension</th>`+SEO.ops.map(o=>
+    `<th><div class="tcol-head" style="--c:${o.color};cursor:default"><span class="tcol-name">${o.name}</span><span class="tcol-score">${o.score}<small>/100</small></span></div></th>`).join("")+`</tr>`;
+  let rows=SEO.dims.map((d,i)=>`<tr><td class="mx-stage">${d}</td>`+
+    SEO.ops.map(o=>`<td class="mx-cell">${sc(o.r[i])}</td>`).join("")+`</tr>`).join("");
+  document.getElementById('seo-matrix').innerHTML=head+rows;
+  const dom={yettel:"yettel.hu",telekomhu:"telekom.hu",one:"one.hu"};
+  document.getElementById('seo-psi').innerHTML=SEO.ops.map(o=>
+    `<a class="psi-btn" target="_blank" rel="noopener" href="https://pagespeed.web.dev/analysis?url=https%3A%2F%2Fwww.${dom[o.key]}">▸ PageSpeed · ${o.name}</a>`).join("");
+  document.getElementById('seo-findings').innerHTML=SEO.ops.map(o=>
+    `<div class="panel on" style="--c:${o.color};margin-top:14px"><div class="panel-head"><h3>${o.name} <span class="pscore">${o.score}<small> SEO posture /100</small></span></h3></div><ul class="spec-list" style="border:none">${o.find.map(x=>`<li><b style="min-width:0;color:var(--c)">›</b><span>${x}</span></li>`).join("")}</ul></div>`).join("");
+})();
+
+/* ---- GEO render (answer-presence 0-100 per buyer question) ---- */
+(function(){
+  const nq=GEO.questions.length, names=["Yettel","Magyar Telekom","One"];
+  const colScore=j=>Math.round(GEO.grid.reduce((a,r)=>a+r[j],0)/nq);
+  const scores=[0,1,2].map(colScore);
+  const leads=[0,1,2].map(j=>GEO.grid.filter(r=>Math.max(...r)===r[j]).length);
+  const tot=scores.reduce((a,b)=>a+b,0);
+  const sov=scores.map(s=>Math.round(s/tot*100));
+  GEO.ops.forEach((o,j)=>{o.vis=scores[j];o.sov=sov[j];o.leads=leads[j];});
+  document.getElementById('geo-note').innerHTML=`Single-model probe — <strong>${GEO.model}</strong>, ${GEO.asOf}. ${nq} <strong>purchase-intent</strong> questions, all anchored to the same buy (${GEO.intent}). Each cell is an <strong>answer-presence score 0–100</strong> — how likely an AI assistant is to surface and cite that operator for that query — from dedicated/crawlable page strength + positioning match, with brand-name dilution applied to One. A directional read, not a measured multi-model share.`;
+  const tier=v=>v>=78?'pos':v>=55?'zero':'weak';
+  const ranked=GEO.ops.map((o,j)=>({o,j})).sort((a,b)=>b.o.vis-a.o.vis);
+  document.getElementById('geo-cards').innerHTML=ranked.map(({o})=>
+    `<div class="kpi" style="border-left-color:${o.color}"><h4 style="color:${o.color}">${o.name}</h4><div style="font-family:'IBM Plex Mono',monospace;font-weight:600;font-size:30px;letter-spacing:-.02em;margin:2px 0 6px">${o.vis}<span style="font-size:13px;color:var(--ink-3)"> /100</span></div><p style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--ink-3);margin-bottom:6px">SoV ${o.sov}% · leads ${o.leads}/${nq} questions</p><p>${o.note}</p></div>`).join("");
+  let head=`<tr><th class="mx-stage">Buyer question (iPhone 16 128 GB + plan)</th>`+GEO.ops.map(o=>`<th><div class="tcol-head" style="--c:${o.color};cursor:default"><span class="tcol-name">${o.name}</span><span class="tcol-score">${o.vis}<small>/100</small></span></div></th>`).join("")+`</tr>`;
+  let rows=GEO.questions.map((q,i)=>{const r=GEO.grid[i];const mx=Math.max(...r);
+    const vod=GEO.vodQ.includes(i)?' <span style="color:var(--offline);font-family:monospace;font-size:11px">· One often cited as “Vodafone”</span>':'';
+    const c=j=>`<td class="mx-cell"><span class="gb ${tier(r[j])}">${r[j]}</span>${r[j]===mx?' <span style="color:var(--meas);font-size:10px;font-family:monospace">▲ leads</span>':''}</td>`;
+    return `<tr><td class="mx-stage" style="font-size:12.5px">${q}${vod}</td>${c(0)}${c(1)}${c(2)}</tr>`;}).join("");
+  document.getElementById('geo-matrix').innerHTML=head+rows;
+  document.getElementById('geo-legend').innerHTML="Cell = answer-presence 0–100 (higher = more likely surfaced & cited). ▲ leads = highest for that question. Columns: Yettel · Magyar Telekom · One.";
+margin-top:14px"><div class="panel-head"><h3>${o.name} <span class="pscore">${o.vis}<small> purchase visibility /100</small></span></h3></div><ul class="spec-list" style="border:none">${o.act.map(a=>`<li><b style="min-width:0;color:var(--c)">›</b><span>${a}</span></li>`).join("")}</ul></div>`).join("");
+})();
+
+
+
+/* ---- Yepp diagnostics charts ---- */
+(function(){
+  function hbars(id,items,opts){opts=opts||{};const el=document.getElementById(id);if(!el)return;
+    const W=700,rowH=opts.rowH||38,padL=opts.padL||170,padR=92,top=6,H=top+items.length*rowH+6;
+    const max=opts.max||Math.max.apply(null,items.map(i=>i.value));
+    let s=`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${id}">`;
+    items.forEach((it,i)=>{const y=top+i*rowH,bw=Math.max(3,(W-padL-padR)*(it.value/max));
+      s+=`<text x="${padL-12}" y="${y+rowH/2+4}" text-anchor="end" font-family="Inter" font-size="12.5" fill="var(--ink-2)">${it.label}</text>`;
+      s+=`<rect x="${padL}" y="${y+6}" width="${bw}" height="${rowH-14}" rx="3" fill="${it.color}"/>`;
+      s+=`<text x="${padL+bw+8}" y="${y+rowH/2+4}" font-family="IBM Plex Mono" font-size="12" font-weight="600" fill="${it.color}">${it.disp}</text>`;});
+    s+=`</svg>`;el.innerHTML=s;}
+  hbars('yepp-funnel',[
+    {label:"Total registrations",value:88650,disp:"88,650 · 100%",color:"var(--digital)"},
+    {label:"Completed trial",value:72295,disp:"72,295 · 82%",color:"#6c8cff"},
+    {label:"Paid 1st fee",value:55800,disp:"55,800 · 63%",color:"#b07ad0"},
+    {label:"Active today",value:42800,disp:"42,800 · 48%",color:"var(--offline)"}
+  ],{max:88650});
+  hbars('yepp-tenure',[
+    {label:"0–3 months",value:11.2,disp:"11.2%",color:"var(--offline)"},
+    {label:"3–6 months",value:7.4,disp:"7.4%",color:"#e0801f"},
+    {label:"6–12 months",value:5.2,disp:"5.2%",color:"#c2a01f"},
+    {label:"12+ months",value:3.1,disp:"3.1%",color:"var(--meas)"}
+  ],{max:12});
+  hbars('yepp-channels',[
+    {label:"Referral / WoM",value:2059,disp:"2,059 HUF",color:"var(--meas)"},
+    {label:"Organic (App Store)",value:3621,disp:"3,621 HUF",color:"#00a15f"},
+    {label:"Partner promos",value:7500,disp:"7,500 HUF",color:"#c2a01f"},
+    {label:"Retail (device / QR)",value:13684,disp:"13,684 HUF",color:"#e0801f"},
+    {label:"Campaign (TV / digital)",value:27857,disp:"27,857 HUF",color:"var(--offline)"}
+  ],{max:27857});
+})();
+
+openDetail('yettel');
+</script>
+</body>
+</html>
