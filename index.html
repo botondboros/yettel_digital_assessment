@@ -391,7 +391,7 @@
             <text x="6" y="152" fill="var(--ink-2)">3 · Telekom</text>
           </g>
           <rect x="92" y="29" width="200.6" height="30" rx="3" fill="#6c3fc5"/>
-          <rect x="92" y="81" width="198.2" height="30" rx="3" fill="#00a15f" stroke="var(--ink)" stroke-width="1.6"/>
+          <rect x="92" y="81" width="198.2" height="30" rx="3" fill="#ccff00" stroke="var(--ink)" stroke-width="1.6"/>
           <rect x="92" y="133" width="186.4" height="30" rx="3" fill="#e20074"/>
           <g font-family="'Space Grotesk',sans-serif" font-weight="700" font-size="19" fill="var(--ink)">
             <text x="300" y="50">85</text>
@@ -439,7 +439,7 @@
         <p class="cap">Observational read /100 — Yettel content lead, Telekom template leak, One rebrand risk</p>
         <svg viewBox="0 0 360 182" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto">
           <text x="6" y="48" font-family="'IBM Plex Mono',monospace" font-size="12" fill="var(--ink)" font-weight="600">1 · Yettel</text>
-          <rect x="92" y="29" width="172.0" height="30" rx="3" fill="#00a15f" stroke="var(--ink)" stroke-width="1.6"/>
+          <rect x="92" y="29" width="172.0" height="30" rx="3" fill="#ccff00" stroke="var(--ink)" stroke-width="1.6"/>
           <text x="272.0" y="50" font-family="'Space Grotesk',sans-serif" font-weight="700" font-size="19" fill="var(--ink)">86</text>
           <text x="6" y="100" font-family="'IBM Plex Mono',monospace" font-size="12" fill="var(--ink-2)" font-weight="400">2 · Telekom</text>
           <rect x="92" y="81" width="164.0" height="30" rx="3" fill="#e20074"/>
@@ -459,15 +459,15 @@
           <rect x="78" y="26" width="158.1" height="20" rx="3" fill="#e20074"/>
           <text x="244.1" y="41" font-family="'Space Grotesk',sans-serif" font-weight="700" font-size="15" fill="var(--ink)">76</text>
           <text x="6" y="70" font-family="'IBM Plex Mono',monospace" font-size="11.5" fill="var(--ink-2)">Yettel</text>
-          <rect x="78" y="56" width="156.0" height="20" rx="3" fill="#00a15f"/>
+          <rect x="78" y="56" width="156.0" height="20" rx="3" fill="#ccff00"/>
           <text x="242.0" y="71" font-family="'Space Grotesk',sans-serif" font-weight="700" font-size="15" fill="var(--ink)">75</text>
           <text x="6" y="100" font-family="'IBM Plex Mono',monospace" font-size="11.5" fill="var(--ink-2)">One</text>
           <rect x="78" y="86" width="112.3" height="20" rx="3" fill="#6c3fc5"/>
           <text x="198.3" y="101" font-family="'Space Grotesk',sans-serif" font-weight="700" font-size="15" fill="var(--ink)">54</text>
           <text x="6" y="146" font-family="'IBM Plex Mono',monospace" font-size="10" fill="var(--ink-3)">QUERY LEADS · RANKS #1 OF 10</text>
-          <rect x="8" y="156" width="170" height="28" rx="3" fill="#00a15f"/>
+          <rect x="8" y="156" width="170" height="28" rx="3" fill="#ccff00"/>
           <rect x="182" y="156" width="170" height="28" rx="3" fill="#e20074"/>
-          <text x="93" y="174" text-anchor="middle" font-family="'IBM Plex Mono',monospace" font-size="12" font-weight="700" fill="#fff">Yettel · 5</text>
+          <text x="93" y="174" text-anchor="middle" font-family="'IBM Plex Mono',monospace" font-size="12" font-weight="700" fill="#1a1a1a">Yettel · 5</text>
           <text x="267" y="174" text-anchor="middle" font-family="'IBM Plex Mono',monospace" font-size="12" font-weight="700" fill="#fff">Telekom · 5</text>
           <text x="8" y="197" font-family="'IBM Plex Mono',monospace" font-size="10" fill="var(--ink-3)">One: 0 of 10 — sources still cite “Vodafone”</text>
           </svg>
@@ -1002,14 +1002,16 @@ const COLS=MX_ORDER.map(k=>PROVIDERS.find(p=>p.key===k));
     s+=`<text x="${xx}" y="${lblY}" transform="rotate(-22 ${xx} ${lblY})" text-anchor="end" font-family="IBM Plex Mono" font-size="9.5" fill="var(--ink-3)">${i+1}. ${st}</text>`;});
   /* lines + points */
   PROVIDERS.forEach(p=>{const pts=p.scores.map((v,i)=>`${x(i)},${y(v)}`).join(" ");
-    s+=`<polyline points="${pts}" fill="none" stroke="${p.color}" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round"/>`;
-    p.scores.forEach((v,i)=>{s+=`<circle cx="${x(i)}" cy="${y(v)}" r="3" fill="${p.color}"/>`;});});
+    const lime=p.key==='yettel';
+    if(lime){s+=`<polyline points="${pts}" fill="none" stroke="#00a15f" stroke-width="5" stroke-linejoin="round" stroke-linecap="round"/>`;}
+    s+=`<polyline points="${pts}" fill="none" stroke="${lime?'#ccff00':p.color}" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round"/>`;
+    p.scores.forEach((v,i)=>{s+=`<circle cx="${x(i)}" cy="${y(v)}" r="3.2" fill="${lime?'#ccff00':p.color}" ${lime?'stroke="#00a15f" stroke-width="1.3"':''}/>`;});});
   /* right-side score labels, de-cluttered */
   const used=[];
   ranking.forEach(p=>{let ly=y(p.final)+4;while(used.some(o=>Math.abs(o-ly)<13))ly+=13;used.push(ly);
     s+=`<text x="${x(n)+8}" y="${ly}" font-family="IBM Plex Mono" font-size="11.5" font-weight="600" fill="${p.color}">${p.short} ${p.final}</text>`;});
   s+=`</svg>`;document.getElementById('chart').innerHTML=s;
-  document.getElementById('legend').innerHTML=PROVIDERS.map(p=>`<span><i style="background:${p.color}"></i>${p.name} <span style="color:var(--ink-3)">· ${p.final}/100</span></span>`).join("");
+  document.getElementById('legend').innerHTML=PROVIDERS.map(p=>`<span><i style="background:${p.key==='yettel'?'#ccff00':p.color};${p.key==='yettel'?'box-shadow:0 0 0 1.6px #00a15f;':''}"></i>${p.name} <span style="color:var(--ink-3)">· ${p.final}/100</span></span>`).join("");
 })();
 
 /* ---- always-on matrix ---- */
@@ -1063,7 +1065,7 @@ function openDetail(key){
   if(curDetail===key){panel.classList.remove('on');curDetail=null;return;}
   COLS.forEach(p=>document.getElementById('panel-'+p.key).classList.remove('on'));
   panel.classList.add('on');curDetail=key;
-  panel.scrollIntoView({behavior:'smooth',block:'nearest'});
+  if(panel&&panel.scrollIntoView){panel.scrollIntoView({behavior:'smooth',block:'nearest'});}
 }
 function tab(name){
   ['exec','yepp','app','friction','seo','geo','actions','methodology'].forEach(t=>{
@@ -1171,7 +1173,7 @@ const GEO={ asOf:"2026-06-19", model:"Claude + web_search (single-model, grounde
     return `<tr><td class="mx-stage" style="font-size:12.5px">${q}${vod}</td>${c(0)}${c(1)}${c(2)}</tr>`;}).join("");
   document.getElementById('geo-matrix').innerHTML=head+rows;
   document.getElementById('geo-legend').innerHTML="Cell = answer-presence 0–100 (higher = more likely surfaced & cited). ▲ leads = highest for that question. Columns: Yettel · Magyar Telekom · One.";
-margin-top:14px"><div class="panel-head"><h3>${o.name} <span class="pscore">${o.vis}<small> purchase visibility /100</small></span></h3></div><ul class="spec-list" style="border:none">${o.act.map(a=>`<li><b style="min-width:0;color:var(--c)">›</b><span>${a}</span></li>`).join("")}</ul></div>`).join("");
+
 })();
 
 
@@ -1208,7 +1210,7 @@ margin-top:14px"><div class="panel-head"><h3>${o.name} <span class="pscore">${o.
   ],{max:27857});
 })();
 
-openDetail('yettel');
+try{openDetail('yettel');}catch(e){}
 </script>
 </body>
 </html>
